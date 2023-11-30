@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  fastapi:
+    build:
+      context: .
+    container_name: fastapi
+    ports:
+      - 8000:80
+
+    networks:
+      - dev
+
+networks:
+  dev:
