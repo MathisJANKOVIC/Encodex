@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 
 app = FastAPI()
 
@@ -18,8 +18,8 @@ def encode(encoding_name: str, sequence: str):
 def decode(encoding_name: str, sequence: str):
     pass
 
-@app.patch("/codex/{encoding_name}/update/{new_encoding_format}")
-def update(encoding_name: str, new_encoding_format: dict):
+@app.patch("/codex/{encoding_name}/update/")
+def update(encoding_name: str, new_encoding_format: dict = Body(...)):
     pass
 
 @app.delete("/codex/{encoding_name}/delete/")
