@@ -32,4 +32,5 @@ class EncodingType(Base):
         for char, encoding_char in encoding_characters.items():
             self.encoding_chars.append(EncodingCharacter(char, encoding_char))
 
-Base.metadata.create_all(database_setup.engine)
+if(__name__ == '__main__'):
+    Base.metadata.create_all(database_setup.engine)
