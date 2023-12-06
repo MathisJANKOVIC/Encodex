@@ -21,9 +21,24 @@ def encode(encoding_name: str, sequence: str):
 def decode(encoding_name: str, sequence: str):
     pass
 
-@app.patch("/encodex/{encoding_name}/update/")
-def update(encoding_name: str, new_encoding_format: dict = Body(...)):
-    pass
+@app.patch("/encodex/{encoding_type_name}/update/", status_code=200)
+def update(encoding_type_name: str, new_encoding_chars: dict = Body(...)):
+
+    session = LocalSession()
+    encoding_type = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()
+
+    if(encoding_type is None):
+        session.close()
+        raise HTTPException(status_code=404, detail={"succes": False, "message": "Encoding type not found"})
+
+    for char, encoding_char in new_encoding_chars.items():
+        encoding_type.encoding_chars.append(EncodingCharacter(char, encoding_char))
+
+    session.add(encoding_type)
+    session.commit()
+
+    session.close()
+    return {"succes": True, "message": "Encoding type updated successfully"}
 
 @app.delete("/encodex/{encoding_type_name}/delete/", status_code=200)
 def delete(encoding_type_name: str):
