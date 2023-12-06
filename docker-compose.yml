@@ -2,8 +2,11 @@ version: '3'
 
 services:
   api:
+    image: codex-api
     build:
       context: .
+    environment:
+      PYTHONPATH: /app/api
     ports:
       - 80:80
     volumes:
@@ -30,7 +33,7 @@ services:
     depends_on:
       - database
     ports:
-      - 3306:80
+      - 8080:80
     environment:
       PMA_HOST: database
     networks:
