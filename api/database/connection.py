@@ -6,7 +6,7 @@ USER = "root"
 PASSWORD = ""
 HOST = "database"
 PORT = "3306"
-DATABASE = "codex-api"
+DATABASE = "encodex-api"
 
 engine = create_engine(f"{DRIVERS}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
 LocalSession = sessionmaker(bind=engine)

@@ -2,7 +2,7 @@ version: '3'
 
 services:
   api:
-    image: codex-api
+    image: encodex-api
     build:
       context: .
     environment:
@@ -22,7 +22,7 @@ services:
       - database-data:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-      MYSQL_DATABASE: 'codex-api'
+      MYSQL_DATABASE: 'encodex-api'
     networks:
       - dev
 
