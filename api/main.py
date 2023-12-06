@@ -1,4 +1,7 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, HTTPException, Body
+
+from database.models import EncodingType
+from database.connection import LocalSession
 
 app = FastAPI()
 
@@ -26,6 +29,16 @@ def update(encoding_name: str, new_encoding_format: dict = Body(...)):
 def delete(encoding_name: str):
     pass
 
-@app.post("/encodex/create/{encoding_name}")
-def create(encoding_name: str):
-    pass
+@app.post("/encodex/create/{encoding_type_name}", status_code=201)
+def create(encoding_type_name: str, encoding_characters: dict = Body(...)):
+
+    session = LocalSession()
+
+    if(session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first() is not None):
+        session.close()
+        raise HTTPException(status_code=400, detail={"Succes": False, "message": "Encoding type already exists"})
+
+    session.add(EncodingType(encoding_type_name, encoding_characters))
+    session.commit()
+
+    return {"Succes": True, "message": "Encoding type created successfully"}
