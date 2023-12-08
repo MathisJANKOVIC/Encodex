@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 
-from database.models import EncodingType, EncodingCharacter
+from database.models import EncodingType, EncodingChar
 from database.connection import LocalSession
 
 router = APIRouter()
@@ -17,7 +17,7 @@ def update(encoding_type_name: str, new_encoding_chars: dict = Body(...)):
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
     for char, encoding_char in new_encoding_chars.items():
-        encoding_type.encoding_chars.append(EncodingCharacter(char, encoding_char))
+        encoding_type.encoding_chars.append(EncodingChar(char, encoding_char))
 
     session.add(encoding_type)
     session.commit()

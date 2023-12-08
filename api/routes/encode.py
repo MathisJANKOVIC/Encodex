@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from database.models import EncodingType, EncodingCharacter
+from database.models import EncodingType, EncodingChar
 from database.connection import LocalSession
 
 router = APIRouter()
@@ -16,7 +16,7 @@ def encode(encoding_type_name: str, sequence: str):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
-    encoding_chars: list[EncodingCharacter] = encoding_type.encoding_chars
+    encoding_chars: list[EncodingChar] = encoding_type.encoding_chars
     session.close()
 
     encoded_sequence = ""

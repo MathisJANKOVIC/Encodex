@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body
 from fastapi.background import P
 from fastapi.responses import JSONResponse
 
-from database.models import EncodingType, EncodingCharacter
+from database.models import EncodingType, EncodingChar
 from database.connection import LocalSession
 
 router = APIRouter()
@@ -18,7 +18,7 @@ def delete(encoding_type_name: str):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
-    session.query(EncodingCharacter).filter(EncodingCharacter.id_encoding_type == encoding_type.id).delete()
+    session.query(EncodingChar).filter(EncodingChar.encoding_type_id == encoding_type.id).delete()
     session.delete(encoding_type)
 
     session.commit()
