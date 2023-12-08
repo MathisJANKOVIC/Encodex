@@ -33,4 +33,5 @@ class EncodingType(Base):
             self.encoding_chars.append(EncodingCharacter(char, encoding_char))
 
 if(__name__ == '__main__'):
+    Base.metadata.drop_all(connection.engine)
     Base.metadata.create_all(connection.engine)
