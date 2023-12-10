@@ -25,28 +25,27 @@ class EncodingType(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
 
-    encoded_chars_len = Column(Integer, nullable=True)
     encoded_chars_sep = Column(String(255), nullable=True)
     encoded_words_sep = Column(String(255), nullable=True)
-
+    encoded_chars_len = Column(Integer, nullable=True)
     encoding_chars = relationship('EncodingChar', backref='encoding_types')
 
     def __init__(
             self: object,
             name: str,
             encoding_chars: dict,
-            encoded_chars_len: int | None = None,
-            encoded_chars_sep: str | None = None,
-            encoded_words_sep: str | None = None
+            encoded_chars_sep: str = "",
+            encoded_words_sep: str = "",
+            encoded_chars_len: int | None = None
         ):
 
         self.name = name
         for char, encoding_char in encoding_chars.items():
             self.encoding_chars.append(EncodingChar(char, encoding_char))
 
-        self.encoded_chars_len = encoded_chars_len
         self.encoded_chars_sep = encoded_chars_sep
         self.encoded_words_sep = encoded_words_sep
+        self.encoded_chars_len = encoded_chars_len
 
 if(__name__ == '__main__'):
     Base.metadata.drop_all(connection.engine)
