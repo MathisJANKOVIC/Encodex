@@ -6,7 +6,7 @@ services:
     build:
       context: .
     environment:
-      PYTHONPATH: /app/api
+      PYTHONPATH: /app/src
     ports:
       - 80:80
     volumes:
