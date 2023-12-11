@@ -1,1 +1,1 @@
-from . import get_type, get_all_types, encode, create_type, delete_type, add_char
+from . import get_type, get_all_types, encode, create_encoding_type, delete_type, add_char
