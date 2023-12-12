@@ -7,7 +7,7 @@ from database.models import EncodingType, EncodingChar
 router = APIRouter()
 
 @router.delete("/encodex/{encoding_type_name}/delete/")
-def main(encoding_type_name: str):
+def delete_encoding_type(encoding_type_name: str):
 
     session = LocalSession()
     encoding_type = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()

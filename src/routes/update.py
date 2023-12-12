@@ -7,7 +7,7 @@ from database.connection import LocalSession
 router = APIRouter()
 
 @router.patch("/encodex/{encoding_type_name}/update/")
-def update(encoding_type_name: str, new_encoding_chars: dict = Body(...)):
+def add_encoding_char(encoding_type_name: str, new_encoding_chars: dict = Body(...)):
 
     session = LocalSession()
     encoding_type = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()

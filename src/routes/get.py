@@ -6,8 +6,24 @@ from database.models import EncodingType
 
 router = APIRouter()
 
+@router.get("/encodex/")
+def get_all_encoding_types():
+
+    session = LocalSession()
+    encoding_types = session.query(EncodingType).all()
+
+    encoding_types = [{
+            "id": encoding_type.id,
+            "name": encoding_type.name,
+            "encoding_chars": {encoding_char.char: encoding_char.encoded_char for encoding_char in encoding_type.encoding_chars}
+        } for encoding_type in encoding_types
+    ]
+
+    session.close()
+    return JSONResponse(status_code=200, content={"succes": True, "content": encoding_types})
+
 @router.get("/encodex/{encoding_type_name}")
-def get(encoding_type_name: str):
+def get_encoding_type(encoding_type_name: str):
 
     session = LocalSession()
     encoding_type = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()

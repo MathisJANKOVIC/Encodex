@@ -13,7 +13,7 @@ class BodyModel(BaseModel):
 router = APIRouter()
 
 @router.post("/encodex/{encoding_type_name}/create/")
-def main(encoding_type_name: str, body: BodyModel = Body(...)):
+def create_encoding_type(encoding_type_name: str, body: BodyModel = Body(...)):
 
     session = LocalSession()
 
