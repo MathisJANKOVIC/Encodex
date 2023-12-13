@@ -26,10 +26,10 @@ def create_encoding_type(encoding_type_name: str, body: BodyModel = Body(...)):
         if(len(char) != 1):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoding characters keys must be one character long"})
-        elif(len(encoded_char) == 0):
+        if(len(encoded_char) == 0):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
-        elif(body.encoded_chars_sep != "" and body.encoded_chars_sep in encoded_char or body.encoded_words_sep != "" and body.encoded_words_sep in encoded_char):
+        if(body.encoded_chars_sep != "" and body.encoded_chars_sep in encoded_char or body.encoded_words_sep != "" and body.encoded_words_sep in encoded_char):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
 
