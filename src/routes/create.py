@@ -38,7 +38,7 @@ def create_encoding_type(encoding_type_name: str, body: BodyModel = Body(...)):
     if(len(body.encoding_chars.values()) != len(set(body.encoding_chars.values()))):
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters must be unique"})
-    elif(body.encoded_chars_sep == body.encoded_words_sep and body.encoded_chars_sep != ""):
+    if(body.encoded_chars_sep == body.encoded_words_sep and body.encoded_chars_sep != ""):
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters and encoded words separators cannot be the same"})
 
