@@ -11,7 +11,7 @@ class BodyModel(BaseModel):
 router = APIRouter()
 
 @router.post("/encodex/{encoding_type_name}/encode/")
-def encode(encoding_type_name: str, body: BodyModel = Body(...)):
+def encode_string(encoding_type_name: str, body: BodyModel = Body(...)):
 
     session = LocalSession()
     encoding_type: EncodingType = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()
