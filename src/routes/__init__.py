@@ -1,1 +1,1 @@
-from . import get, create, delete, update, encode
+from . import get, create, delete, update, encode, decode
