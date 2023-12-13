@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
 
 from database import connection
@@ -24,16 +24,20 @@ class EncodingType(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
+    is_case_sensitive = Column(Boolean, nullable=False)
 
     encoded_chars_sep = Column(String(255), nullable=True)
     encoded_words_sep = Column(String(255), nullable=True)
     encoded_chars_len = Column(Integer, nullable=True)
+
     encoding_chars = relationship('EncodingChar', backref='encoding_types')
 
-    def __init__(self, name: str, encoding_chars: dict, encoded_chars_sep: str, encoded_words_sep: str, encoded_chars_len: int | None):
+    def __init__(self, name: str, encoding_chars: dict, is_case_sensitive: bool, encoded_chars_sep: str, encoded_words_sep: str, encoded_chars_len: int | None):
         self.name = name
         for char, encoding_char in encoding_chars.items():
             self.encoding_chars.append(EncodingChar(char, encoding_char))
+
+        self.is_case_sensitive = is_case_sensitive
 
         self.encoded_chars_sep = encoded_chars_sep
         self.encoded_words_sep = encoded_words_sep
