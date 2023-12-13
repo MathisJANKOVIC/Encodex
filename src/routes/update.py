@@ -30,16 +30,17 @@ def update_encoding_char(encoding_type_name: str, body: BodyModel = Body(...)):
         if(len(char) != 1):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoding characters keys must be one character long"})
-        elif(len(encoded_char) == 0):
+        if(len(encoded_char) == 0):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
-        elif(encoding_type.encoded_chars_sep != "" and encoding_type.encoded_chars_sep in encoded_char or encoding_type.encoded_words_sep != "" and encoding_type.encoded_words_sep in encoded_char):
+        if(encoding_type.encoded_chars_sep != "" and encoding_type.encoded_chars_sep in encoded_char or encoding_type.encoded_words_sep != "" and encoding_type.encoded_words_sep in encoded_char):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
+        if(encoding_type.encoded_chars_len is not None and len(encoded_char) != encoding_type.encoded_chars_len):
+            pass
+        existing_encoding_char = session.query(EncodingChar).filter(EncodingChar.char == char and EncodingChar.encoding_type_id == encoding_type.id).first()
 
-        existing_encoding_char = session.query(EncodingChar).filter(EncodingChar.char == char).first()
-
-        if(existing_encoding_char is not None):
+        if(existing_encoding_char is None):
             encoding_type.encoding_chars.append(EncodingChar(char, encoded_char))
         else:
             existing_encoding_char.encoded_char = encoded_char
