@@ -20,6 +20,9 @@ def decode_string(encoding_type_name: str, body: BodyModel = Body(...)):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
+    if(not encoding_type.is_case_sensitive):
+        body.encoded_string = body.encoded_string.lower()
+
     decoded_str = buffer = ""
 
     if(encoding_type.encoded_chars_len is None):
