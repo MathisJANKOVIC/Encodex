@@ -11,6 +11,6 @@ app.include_router(routes.decode.router)
 
 app.include_router(routes.create.router)
 
-app.include_router(routes.delete.router)
-
 app.include_router(routes.update.router)
+
+app.include_router(routes.delete.router)
