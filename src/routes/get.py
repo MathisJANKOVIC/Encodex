@@ -12,18 +12,10 @@ def get_all_encoding_types():
     session = LocalSession()
     encoding_types: list[EncodingType] = session.query(EncodingType).all()
 
-    encoding_types = [{
-            "id": encoding_type.id,
-            "name": encoding_type.name,
-            "encoded_char_length": encoding_type.encoded_chars_len,
-            "encoded_chars_sep": encoding_type.encoded_chars_sep,
-            "encoded_words_sep": encoding_type.encoded_words_sep ,
-            "encoding_chars": {encoding_char.char: encoding_char.encoded_char for encoding_char in encoding_type.encoding_chars}
-        } for encoding_type in encoding_types
-    ]
+    encoding_types_dict = [encoding_type.dict() for encoding_type in encoding_types]
 
     session.close()
-    return JSONResponse(status_code=200, content={"succes": True, "content": encoding_types})
+    return JSONResponse(status_code=200, content={"succes": True, "content": encoding_types_dict})
 
 @router.get("/encodex/{encoding_type_name}")
 def get_encoding_type(encoding_type_name: str):
@@ -35,14 +27,7 @@ def get_encoding_type(encoding_type_name: str):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
-    encoding_type = {
-        "id": encoding_type.id,
-        "name": encoding_type.name,
-        "encoding_chars": {encoding_char.char: encoding_char.encoded_char for encoding_char in encoding_type.encoding_chars},
-        "encoded_char_length": encoding_type.encoded_chars_len,
-        "encoded_chars_sep": encoding_type.encoded_chars_sep,
-        "encoded_words_sep": encoding_type.encoded_words_sep
-    }
+    encoding_type_dict = encoding_type.dict()
 
     session.close()
-    return JSONResponse(status_code=200, content = {"succes": True, "content": encoding_type})
+    return JSONResponse(status_code=200, content = {"succes": True, "content": encoding_type_dict})

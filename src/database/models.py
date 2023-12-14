@@ -43,6 +43,18 @@ class EncodingType(Base):
         self.encoded_words_sep = encoded_words_sep
         self.encoded_chars_len = encoded_chars_len
 
+    def dict(self) -> dict:
+        """Returns a dictionary representation of the encoding type"""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "is_case_sensitive": self.is_case_sensitive,
+            "encoded_chars_sep": self.encoded_chars_sep,
+            "encoded_words_sep": self.encoded_words_sep,
+            "encoded_chars_len": self.encoded_chars_len,
+            "encoding_chars": {encoding_char.char: encoding_char.encoded_char for encoding_char in self.encoding_chars}
+        }
+
 if(__name__ == '__main__'):
     Base.metadata.drop_all(connection.engine)
     Base.metadata.create_all(connection.engine)
