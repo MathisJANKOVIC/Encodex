@@ -6,7 +6,7 @@ from database.models import EncodingType
 from database.connection import LocalSession
 
 class BodyModel(BaseModel):
-    sequence: str
+    string: str
 
 router = APIRouter()
 
@@ -20,19 +20,15 @@ def encode_string(encoding_type_name: str, body: BodyModel = Body(...)):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
-    encoded_sequence = ""
-    for char in body.sequence:
+    encoded_string = ""
+    for i, char in enumerate(body.string):
         if(char == " "):
-            encoded_sequence = encoded_sequence + encoding_type.encoded_words_sep
+            encoded_string = encoded_string + encoding_type.encoded_words_sep
         else:
-            encoded_char = next((encoding_char.encoded_char for encoding_char in encoding_type.encoding_chars if encoding_char.char == char), None)
-            if(encoded_char is None):
-                encoded_sequence = encoded_sequence + char
-            else:
-                encoded_sequence = encoded_sequence + encoded_char
+            encoded_char = next((encoding_char.encoded_char for encoding_char in encoding_type.encoding_chars if encoding_char.char == char), char)
+            encoded_string = encoded_string + encoded_char
 
-            if(char != body.sequence[-1]):
-                encoded_sequence = encoded_sequence + encoding_type.encoded_chars_sep
-
+            if(i+1 < len(body.string) and body.string[i+1] != " "):
+                encoded_string = encoded_string + encoding_type.encoded_chars_sep
     session.close()
-    return JSONResponse(status_code=200, content={"succes": True, "content": encoded_sequence})
+    return JSONResponse(status_code=200, content={"succes": True, "content": encoded_string})
