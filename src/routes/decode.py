@@ -6,7 +6,7 @@ from database.models import EncodingType
 from database.connection import LocalSession
 
 class BodyModel(BaseModel):
-    encoded_str: str
+    encoded_string: str
 
 router = APIRouter()
 
@@ -20,49 +20,32 @@ def decode_string(encoding_type_name: str, body: BodyModel = Body(...)):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
 
-    decoded_str = ""
+    decoded_str = buffer = ""
 
     if(encoding_type.encoded_chars_len is None):
-
-        buffer = ""
-        for encoded_char in body.encoded_str :
+        for encoded_char in body.encoded_string:
             if(encoded_char == encoding_type.encoded_words_sep):
-                if buffer:
-                    decoded_str += next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), buffer)
-                    buffer = ""
-                decoded_str += " "
+                decoded_str = decoded_str + encoding_type.decoded_char(buffer) + " "
+                buffer = ""
             elif(encoded_char == encoding_type.encoded_chars_sep):
-                if buffer:
-                    decoded_str += next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), buffer)
-                    buffer = ""
+                decoded_str = decoded_str + encoding_type.decoded_char(buffer)
+                buffer = ""
             else:
-                decoded_char = next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), None)
+                buffer = buffer + encoded_char
 
-                if(decoded_char is None):
-                    buffer += encoded_char
-
-                else:
-                    decoded_str += decoded_char
-
-        if(buffer):
-            decoded_str += next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), buffer)
-        decoded_str += " "
+        decoded_str = decoded_str + encoding_type.decoded_char(buffer)
     else:
-        buffer = ""
-        for encoded_char in body.encoded_str :
+        for encoded_char in body.encoded_string :
             if(encoded_char == encoding_type.encoded_words_sep):
-                if buffer:
-                    decoded_str += next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), buffer)
-                    buffer = ""
-                decoded_str += " "
+                decoded_str = decoded_str + encoding_type.decoded_char(buffer) + " "
+                buffer = ""
             elif(encoded_char == encoding_type.encoded_chars_sep):
-                if buffer:
-                    decoded_str += next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), buffer)
-                    buffer = ""
+                decoded_str = decoded_str + encoding_type.decoded_char(buffer)
+                buffer = ""
             else:
-                buffer += encoded_char
+                buffer = buffer + encoded_char
                 if(len(buffer) == encoding_type.encoded_chars_len):
-                    decoded_str += next((encoding_char.char for encoding_char in encoding_type.encoding_chars if encoding_char.encoded_char == buffer), buffer)
+                    decoded_str = decoded_str + encoding_type.decoded_char(buffer)
                     buffer = ""
 
     session.close()
