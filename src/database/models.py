@@ -44,7 +44,7 @@ class EncodingType(Base):
         self.encoded_chars_len = encoded_chars_len
 
     def dict(self) -> dict:
-        """Returns a dictionary representation of the encoding type"""
+        """Returns a dictionary representation of EncodingType object"""
         return {
             "id": self.id,
             "name": self.name,
@@ -54,6 +54,14 @@ class EncodingType(Base):
             "encoded_chars_len": self.encoded_chars_len,
             "encoding_chars": {encoding_char.char: encoding_char.encoded_char for encoding_char in self.encoding_chars}
         }
+
+    def encoded_char(self, char: str) -> str:
+        """Returns the encoded version of `char` if exists in the encoding character set otherwise returns `char`"""
+        return next((encoding_char.encoded_char for encoding_char in self.encoding_chars if encoding_char.char == char), char)
+
+    def decoded_char(self, encoded_char: str) -> str:
+        """Returns the decoded version of `decoded_char` if exists in the encoding character set otherwise returns `decoded_char`"""
+        return next((encoding_char.char for encoding_char in self.encoding_chars if encoding_char.encoded_char == encoded_char), encoded_char)
 
 if(__name__ == '__main__'):
     Base.metadata.drop_all(connection.engine)
