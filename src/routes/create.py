@@ -5,15 +5,16 @@ from fastapi.responses import JSONResponse
 from database.models import EncodingType
 from database.connection import LocalSession
 
-class BodyModel(BaseModel):
+class EncodingTypeModel(BaseModel):
     encoding_chars: dict[str, str]
+    is_case_sensitive: bool = False
     encoded_chars_sep: str = ""
     encoded_words_sep: str = ""
 
 router = APIRouter()
 
 @router.post("/encodex/{encoding_type_name}/create/")
-def create_encoding_type(encoding_type_name: str, body: BodyModel = Body(...)):
+def create_encoding_type(encoding_type_name: str, new_encoding_type: EncodingTypeModel = Body(...)):
 
     session = LocalSession()
 
@@ -21,29 +22,36 @@ def create_encoding_type(encoding_type_name: str, body: BodyModel = Body(...)):
         session.close()
         return JSONResponse(status_code=409, content={"Succes": False, "message": "Encoding type already exists"})
 
+    if(not new_encoding_type.is_case_sensitive):
+        for char in new_encoding_type.encoding_chars.keys():
+            new_encoding_type.encoding_chars[char] = new_encoding_type.encoding_chars[char].lower()
+
     encoded_chars_lens = set()
-    for char, encoded_char in body.encoding_chars.items():
+    for char, encoded_char in new_encoding_type.encoding_chars.items():
         if(len(char) != 1):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoding characters keys must be one character long"})
         if(len(encoded_char) == 0):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
-        if(body.encoded_chars_sep != "" and body.encoded_chars_sep in encoded_char or body.encoded_words_sep != "" and body.encoded_words_sep in encoded_char):
+        if(new_encoding_type.encoded_chars_sep != "" and new_encoding_type.encoded_chars_sep in encoded_char or new_encoding_type.encoded_words_sep != "" and new_encoding_type.encoded_words_sep in encoded_char):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
 
         encoded_chars_lens.add(len(encoded_char))
 
-    if(len(body.encoding_chars.values()) != len(set(body.encoding_chars.values()))):
+    if(len(new_encoding_type.encoding_chars.values()) != len(set(new_encoding_type.encoding_chars.values()))):
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters must be unique"})
-    if(body.encoded_chars_sep == body.encoded_words_sep and body.encoded_chars_sep != ""):
+
+    if(new_encoding_type.encoded_chars_sep == new_encoding_type.encoded_words_sep and new_encoding_type.encoded_chars_sep != ""):
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters and encoded words separators cannot be the same"})
 
     if(len(encoded_chars_lens) > 1):
-        if(not body.encoded_chars_sep or not body.encoded_words_sep):
+        if(new_encoding_type.encoded_chars_sep and new_encoding_type.encoded_words_sep):
+            encoded_char_len = None
+        else:
             session.close()
             return JSONResponse(
                 status_code = 422,
@@ -53,10 +61,17 @@ def create_encoding_type(encoding_type_name: str, body: BodyModel = Body(...)):
                         + "please specify encoded characters and encoding words separators"
                         + "or make all encoded characters have the same length"
                 })
-        else:
-            session.add(EncodingType(encoding_type_name, body.encoding_chars, body.encoded_chars_sep, body.encoded_words_sep, None))
     else:
-        session.add(EncodingType(encoding_type_name, body.encoding_chars, body.encoded_chars_sep, body.encoded_words_sep, encoded_chars_lens))
+        encoded_char_len = encoded_chars_lens
+
+    session.add(EncodingType(
+        name = encoding_type_name,
+        encoding_chars = new_encoding_type.encoding_chars,
+        is_case_sensitive = new_encoding_type.is_case_sensitive,
+        encoded_chars_sep = new_encoding_type.encoded_chars_sep,
+        encoded_words_sep = new_encoding_type.encoded_words_sep,
+        encoded_chars_len = encoded_char_len
+    ))
 
     session.commit()
     session.close()
