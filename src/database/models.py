@@ -25,12 +25,12 @@ class EncodingStandard(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
 
-    case_sensitive = Column(Boolean, default=True)
+    case_sensitive = Column(Boolean, nullable=False)
     allowed_unrefenced_chars = Column(Boolean, default=False)
 
     encoded_char_len = Column(Integer)
-    encoded_char_sep = Column(String(255), default="")
-    encoded_word_sep = Column(String(255), default=" ")
+    encoded_char_sep = Column(String(255), nullable=False)
+    encoded_word_sep = Column(String(255), nullable=False)
 
     charset = relationship('CodePoint', backref='char_encoding_standards')
 
