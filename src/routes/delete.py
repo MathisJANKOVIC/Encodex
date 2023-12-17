@@ -10,14 +10,14 @@ router = APIRouter()
 def delete_encoding_standard(encoding_type_name: str):
 
     session = LocalSession()
-    encoding_type = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
+    encoding_standard = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
 
-    if(encoding_type is None):
+    if(encoding_standard is None):
         session.close()
         return JSONResponse(status_code=404, content={"succes": False, "message": "Character encoding standard not found"})
 
-    session.query(CodePoint).filter(CodePoint.encoding_standard_id == encoding_type.id).delete()
-    session.delete(encoding_type)
+    session.query(CodePoint).filter(CodePoint.encoding_standard_id == encoding_standard.id).delete()
+    session.delete(encoding_standard)
 
     session.commit()
     session.close()
