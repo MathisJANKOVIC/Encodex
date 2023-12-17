@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from database.models import EncodingType
+from database.models import EncodingStandard
 from database.connection import LocalSession
 
 router = APIRouter()
@@ -10,7 +10,7 @@ router = APIRouter()
 def get_all_encoding_types():
 
     session = LocalSession()
-    encoding_types: list[EncodingType] = session.query(EncodingType).all()
+    encoding_types: list[EncodingStandard] = session.query(EncodingStandard).all()
 
     encoding_types_dict = [encoding_type.dict() for encoding_type in encoding_types]
 
@@ -21,7 +21,7 @@ def get_all_encoding_types():
 def get_encoding_type(encoding_type_name: str):
 
     session = LocalSession()
-    encoding_type = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()
+    encoding_type = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
 
     if(encoding_type is None):
         session.close()
