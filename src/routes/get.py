@@ -7,7 +7,7 @@ from database.connection import LocalSession
 router = APIRouter()
 
 @router.get("/encodex/")
-def get_all_encoding_types():
+def get_all_encoding_standards():
 
     session = LocalSession()
     encoding_types: list[EncodingStandard] = session.query(EncodingStandard).all()
@@ -18,7 +18,7 @@ def get_all_encoding_types():
     return JSONResponse(status_code=200, content={"succes": True, "content": encoding_types_dict})
 
 @router.get("/encodex/{encoding_type_name}")
-def get_encoding_type(encoding_type_name: str):
+def get_encoding_standard(encoding_type_name: str):
 
     session = LocalSession()
     encoding_type = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
