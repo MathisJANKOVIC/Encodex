@@ -36,23 +36,23 @@ class EncodingStandard(Base):
 
     def __init__(self,
             name: str,
-            charset: dict[str, str],
             case_sensitive: bool,
             allowed_unrefenced_chars: bool,
-            encoded_chars_len: int | None,
-            encoded_chars_sep: str,
-            encoded_words_sep: str
+            encoded_char_len: int | None,
+            encoded_char_sep: str,
+            encoded_word_sep: str,
+            charset: dict[str, str]
         ):
         self.name = name
-        for char, encoding_char in charset.items():
-            self.charset.append(CodePoint(char, encoding_char))
-
         self.case_sensitive = case_sensitive
         self.allowed_unrefenced_chars = allowed_unrefenced_chars
 
-        self.encoded_char_len = encoded_chars_len
-        self.encoded_char_sep = encoded_chars_sep
-        self.encoded_word_sep = encoded_words_sep
+        self.encoded_char_len = encoded_char_len
+        self.encoded_char_sep = encoded_char_sep
+        self.encoded_word_sep = encoded_word_sep
+
+        for char, encoding_char in charset.items():
+            self.charset.append(CodePoint(char, encoding_char))
 
     def dict(self) -> dict:
         """Returns a dictionary representation of the object"""
@@ -61,10 +61,10 @@ class EncodingStandard(Base):
             "name": self.name,
             "case_sensitive": self.case_sensitive,
             "allowed_unrefenced_chars": self.allowed_unrefenced_chars,
-            "encoded_chars_len": self.encoded_char_len,
-            "encoded_chars_sep": self.encoded_char_sep,
-            "encoded_words_sep": self.encoded_word_sep,
-            "encoding_chars": {encoding_char.char: encoding_char.encoded_char for encoding_char in self.charset}
+            "encoded_char_len": self.encoded_char_len,
+            "encoded_char_sep": self.encoded_char_sep,
+            "encoded_word_sep": self.encoded_word_sep,
+            "charset": {encoding_char.char: encoding_char.encoded_char for encoding_char in self.charset}
         }
 
     def encoded_char(self, char: str) -> str | None:

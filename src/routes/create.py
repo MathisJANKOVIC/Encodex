@@ -63,12 +63,12 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
         charset = encoding_standard.charset,
         case_sensitive = encoding_standard.case_sensitive,
         allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
-        encoded_chars_len = encoding_standard.encoded_char_len,
-        encoded_chars_sep = encoding_standard.encoded_char_sep,
-        encoded_words_sep = encoding_standard.encoded_word_sep
+        encoded_char_len = encoding_standard.encoded_char_len,
+        encoded_char_sep = encoding_standard.encoded_char_sep,
+        encoded_word_sep = encoding_standard.encoded_word_sep
     ))
 
     session.commit()
     session.close()
 
-    return JSONResponse(status_code=201, content={"succes": True, "message": "Encoding type created successfully"})
+    return JSONResponse(status_code=201, content={"succes": True, "message": "Character encoding standard created successfully"})
