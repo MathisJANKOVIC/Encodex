@@ -8,12 +8,6 @@ from database.models import EncodingType, EncodingChar
 class BodyModel(BaseModel):
     encoding_chars: dict
 
-def encoding_char_to_dict(encoding_char):
-    return {key: value for key, value in encoding_char.__dict__.items() if not key.startswith('_sa_')}
-
-def encoding_chars_to_dicts(encoding_chars):
-    return [encoding_char_to_dict(encoding_char) for encoding_char in encoding_chars]
-
 router = APIRouter()
 
 @router.patch("/encodex/{encoding_type_name}/update/")
@@ -36,8 +30,7 @@ def update_encoding_char(encoding_type_name: str, body: BodyModel = Body(...)):
         if(encoding_type.encoded_chars_sep != "" and encoding_type.encoded_chars_sep in encoded_char or encoding_type.encoded_words_sep != "" and encoding_type.encoded_words_sep in encoded_char):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
-        if(encoding_type.encoded_chars_len is not None and len(encoded_char) != encoding_type.encoded_chars_len):
-            pass
+
         existing_encoding_char = session.query(EncodingChar).filter(EncodingChar.char == char and EncodingChar.encoding_type_id == encoding_type.id).first()
 
         if(existing_encoding_char is None):
@@ -47,6 +40,6 @@ def update_encoding_char(encoding_type_name: str, body: BodyModel = Body(...)):
 
     session.add(encoding_type)
     session.commit()
-    session.close()
 
+    session.close()
     return JSONResponse(status_code=200, content={"succes": True, "message": "Encoding type updated successfully"})
