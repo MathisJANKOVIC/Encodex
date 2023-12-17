@@ -25,7 +25,7 @@ def get_encoding_type(encoding_type_name: str):
 
     if(encoding_type is None):
         session.close()
-        return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
+        return JSONResponse(status_code=404, content={"succes": False, "message": "Character encoding standard not found"})
 
     encoding_type_dict = encoding_type.dict()
 

@@ -14,7 +14,7 @@ def delete_encoding_standard(encoding_type_name: str):
 
     if(encoding_type is None):
         session.close()
-        return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
+        return JSONResponse(status_code=404, content={"succes": False, "message": "Character encoding standard not found"})
 
     session.query(CodePoint).filter(CodePoint.encoding_standard_id == encoding_type.id).delete()
     session.delete(encoding_type)
@@ -22,4 +22,4 @@ def delete_encoding_standard(encoding_type_name: str):
     session.commit()
     session.close()
 
-    return JSONResponse(status_code=200, content={"succes": True, "message": "Encoding type deleted successfully"})
+    return JSONResponse(status_code=200, content={"succes": True, "message": "Character encoding standard deleted successfully"})
