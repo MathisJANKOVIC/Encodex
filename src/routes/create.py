@@ -9,13 +9,12 @@ from database.connection import LocalSession
 
 class EncodingStandardModel(BaseModel):
     name: str
-    charset: dict[str, str]
-    case_sensitive: Optional[bool] = True
+    case_sensitive: bool
     allowed_unrefenced_chars: Optional[bool] = False
-
     encoded_char_len: Optional[int] = None
-    encoded_char_sep: Optional[str] = ""
-    encoded_word_sep: Optional[str] = " "
+    encoded_char_sep: str
+    encoded_word_sep: str
+    charset: dict[str, str]
 
 router = APIRouter()
 
@@ -26,12 +25,14 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
 
     if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
         session.close()
-        return JSONResponse(status_code=409, content={"Succes": False, "message": f"Character encoding standard named '{encoding_standard.name}' already exists"})
+        return JSONResponse(status_code=409, content={
+            "succes": False,
+            "message": f"Character encoding standard '{encoding_standard.name}' already exists"
+        })
 
-    if(not encoding_standard.case_sensitive):
-        for char in encoding_standard.charset.keys():
-            encoding_standard.charset[char] = encoding_standard.charset[char].lower()
-
+    if(len(encoding_standard.name) < 3):
+        session.close()
+        return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name must have at least 3 characters"})
 
     if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
         session.close()
@@ -40,6 +41,16 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
     if(encoding_standard.encoded_char_sep == encoding_standard.encoded_word_sep and encoding_standard.encoded_char_sep != ""):
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters and encoded words separators cannot be equal"})
+
+    if(encoding_standard.encoded_char_len is None and (encoding_standard.encoded_char_len == "" or encoding_standard.encoded_word_sep == "")):
+        session.close()
+        return JSONResponse(status_code=422, content={
+            "succes": False,
+            "message": "if encoded character length is not defined, encoded character and encoded word separators must be defined"
+        })
+
+    if(not encoding_standard.case_sensitive):
+        encoding_standard.charset = {char.lower(): encoded_char for char, encoded_char in encoding_standard.charset.items()}
 
     for char, encoded_char in encoding_standard.charset.items():
         if(len(char) != 1):
@@ -52,20 +63,24 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
                 return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
         elif(len(encoded_char) != encoding_standard.encoded_char_len):
             session.close()
-            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters must have the same length as specified in the encoding standard"})
+            return JSONResponse(status_code=422, content={
+                "succes": False,
+                "message": "Encoded characters lenght must be the same as defined in character encoding standard"
+            })
 
-        if(encoding_standard.encoded_char_sep != "" and encoding_standard.encoded_char_sep in encoded_char or encoding_standard.encoded_word_sep != "" and encoding_standard.encoded_word_sep in encoded_char):
+        if(encoding_standard.encoded_char_sep in encoded_char and len(encoding_standard.encoded_char_sep) > 0 or
+            encoding_standard.encoded_word_sep in encoded_char and len(encoding_standard.encoded_word_sep) > 0):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
 
     session.add(EncodingStandard(
         name = encoding_standard.name,
-        charset = encoding_standard.charset,
         case_sensitive = encoding_standard.case_sensitive,
         allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
         encoded_char_len = encoding_standard.encoded_char_len,
         encoded_char_sep = encoding_standard.encoded_char_sep,
-        encoded_word_sep = encoding_standard.encoded_word_sep
+        encoded_word_sep = encoding_standard.encoded_word_sep,
+        charset = encoding_standard.charset
     ))
 
     session.commit()
