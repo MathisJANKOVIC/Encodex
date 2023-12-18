@@ -27,12 +27,20 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
         session.close()
         return JSONResponse(status_code=409, content={
             "succes": False,
-            "message": f"Character encoding standard '{encoding_standard.name}' already exists"
+            "message": f"Character encoding standard `{encoding_standard.name}` already exists"
         })
 
     if(len(encoding_standard.name) < 3):
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name must have at least 3 characters"})
+
+    if(len(encoding_standard.name) > 64):
+        session.close()
+        return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name must have at most 64 characters"})
+
+    if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
+        session.close()
+        return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name cannot contain special characters"})
 
     if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
         session.close()
