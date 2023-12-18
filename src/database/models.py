@@ -54,7 +54,6 @@ class EncodingStandard(Base):
         for char, encoding_char in charset.items():
             self.charset.append(CodePoint(char, encoding_char))
 
-    @property
     def dict(self) -> dict:
         """Returns a dictionary representation of the object"""
         return {
