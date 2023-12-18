@@ -10,9 +10,9 @@ router = APIRouter()
 def get_all_encoding_standards():
 
     session = LocalSession()
-    encoding_standard: list[EncodingStandard] = session.query(EncodingStandard).all()
+    encoding_standards: list[EncodingStandard] = session.query(EncodingStandard).all()
 
-    encoding_standard_dict = [encoding_type.dict() for encoding_type in encoding_standard]
+    encoding_standard_dict = [encoding_standard.dict() for encoding_standard in encoding_standards]
 
     session.close()
     return JSONResponse(status_code=200, content={"succes": True, "content": encoding_standard_dict})
