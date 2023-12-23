@@ -1,0 +1,37 @@
+{
+    "name": "maj",
+    "case_sensitive": true,
+    "allowed_unrefenced_chars": true,
+    "encoded_char_len": null,
+    "encoded_char_sep": ".",
+    "encoded_word_sep": " ",
+    "charset": {
+        "a": "A",
+        "b": "B",
+        "c": "CC",
+        "d": "D",
+        "e": "EEE",
+        "f": "FFFF",
+        "g": "GGG",
+        "h": "H",
+        "i": "I",
+        "j": "J",
+        "k": "K",
+        "l": "L",
+        "m": "MM",
+        "n": "NN",
+        "o": "OO",
+        "p": "P",
+        "q": "Q",
+        "r": "R",
+        "s": "S",
+        "t": "T",
+        "u": "U",
+        "v": "VVVV",
+        "w": "W",
+        "x": "X",
+        "y": "Y",
+        "z": "Z"
+    }
+
+}
