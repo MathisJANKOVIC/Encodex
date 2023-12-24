@@ -3,8 +3,7 @@
     "case_sensitive": true,
     "allowed_unrefenced_chars": false,
     "encoded_char_len": 2,
-    "encoded_char_sep": "",
-    "encoded_word_sep": "20",
+    "encoded_char_sep": " ",
     "charset": {
         "!": "21",
         "\"": "22",
@@ -99,6 +98,7 @@
         "{": "7B",
         "|": "7C",
         "}": "7D",
-        "~": "7E"
+        "~": "7E",
+        " ": "20"
     }
 }

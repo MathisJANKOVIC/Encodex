@@ -30,7 +30,6 @@ class EncodingStandard(Base):
 
     encoded_char_len = Column(Integer)
     encoded_char_sep = Column(String(255), nullable=False)
-    encoded_word_sep = Column(String(255), nullable=False)
 
     charset = relationship('CodePoint', backref='char_encoding_standards')
 
@@ -40,7 +39,6 @@ class EncodingStandard(Base):
             allowed_unrefenced_chars: bool,
             encoded_char_len: int | None,
             encoded_char_sep: str,
-            encoded_word_sep: str,
             charset: dict[str, str]
         ):
         self.name = name
@@ -49,7 +47,6 @@ class EncodingStandard(Base):
 
         self.encoded_char_len = encoded_char_len
         self.encoded_char_sep = encoded_char_sep
-        self.encoded_word_sep = encoded_word_sep
 
         for char, encoding_char in charset.items():
             self.charset.append(CodePoint(char, encoding_char))
@@ -62,22 +59,21 @@ class EncodingStandard(Base):
             "allowed_unrefenced_chars": self.allowed_unrefenced_chars,
             "encoded_char_len": self.encoded_char_len,
             "encoded_char_sep": self.encoded_char_sep,
-            "encoded_word_sep": self.encoded_word_sep,
             "charset": {encoding_char.char: encoding_char.encoded_char for encoding_char in self.charset}
         }
 
-    def encode_char(self, char: str) -> str | None:
+    def encode(self, char: str) -> str | None:
         """Returns the encoded version of `char` if exists in the charset otherwise returns None"""
         for code_point in self.charset:
             if(code_point.char == char):
                 return code_point.encoded_char
         return None
 
-    def decode_char(self, encoded_char: str) -> str | None:
+    def decode(self, encoded_char: str) -> str | None:
         """Returns the encoded version of `encoded_char` if exists in the charset otherwise returns None"""
         for code_point in self.charset:
             if(code_point.encoded_char == encoded_char):
-                return code_point.encoded_char
+                return code_point.char
         return None
 
 if(__name__ == '__main__'):

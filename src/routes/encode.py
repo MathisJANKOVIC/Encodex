@@ -26,22 +26,19 @@ def encode_string(body: BodyModel = Body(...)):
         if(not encoding_standard.case_sensitive):
             char = char.lower()
 
-        if(char == " "):
-            encoded_string = encoded_string + encoding_standard.encoded_word_sep
-        else:
-            encoded_char = encoding_standard.encode_char(char)
+        encoded_char = encoding_standard.encode(char)
 
-            if(encoded_char is None):
-                if(encoding_standard.allowed_unrefenced_chars):
-                    encoded_string = encoded_string + char
-                else:
-                    session.close()
-                    return JSONResponse(status_code=422, content={"succes": False, "message": f"Coulnd't encode character `{char}`"})
+        if(encoded_char is None):
+            if(encoding_standard.allowed_unrefenced_chars):
+                encoded_string = encoded_string + char
             else:
-                encoded_string = encoded_string + encoded_char
+                session.close()
+                return JSONResponse(status_code=422, content={"succes": False, "message": f"Coulnd't encode character `{char}`"})
+        else:
+            encoded_string = encoded_string + encoded_char
 
-            if(i+1 < len(body.string) and body.string[i+1] != " "): # If the next character is not a space or the last character
-                encoded_string = encoded_string + encoding_standard.encoded_char_sep
+        if(i+1 < len(body.string)):
+            encoded_string = encoded_string + encoding_standard.encoded_char_sep
 
     session.close()
     return JSONResponse(status_code=200, content={"succes": True, "content": encoded_string})

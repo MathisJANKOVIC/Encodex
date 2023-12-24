@@ -13,7 +13,6 @@ class EncodingStandardModel(BaseModel):
     allowed_unrefenced_chars: Optional[bool] = False
     encoded_char_len: Optional[int] = None
     encoded_char_sep: str
-    encoded_word_sep: str
     charset: dict[str, str]
 
 router = APIRouter()
@@ -46,15 +45,11 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
         session.close()
         return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters must be unique"})
 
-    if(encoding_standard.encoded_char_sep == encoding_standard.encoded_word_sep and encoding_standard.encoded_char_sep != ""):
-        session.close()
-        return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters and encoded words separators cannot be equal"})
-
-    if(encoding_standard.encoded_char_len is None and (encoding_standard.encoded_char_len == "" or encoding_standard.encoded_word_sep == "")):
+    if(encoding_standard.encoded_char_len is None and encoding_standard.encoded_char_len == ""):
         session.close()
         return JSONResponse(status_code=422, content={
             "succes": False,
-            "message": "if encoded character length is not defined, encoded character and encoded word separators must be defined"
+            "message": "Encoded characters lenght or separator must be defined in character encoding standard"
         })
 
     if(not encoding_standard.case_sensitive):
@@ -76,10 +71,9 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
                 "message": "Encoded characters lenght must be the same as defined in character encoding standard"
             })
 
-        if(encoding_standard.encoded_char_sep in encoded_char and len(encoding_standard.encoded_char_sep) > 0 or
-            encoding_standard.encoded_word_sep in encoded_char and len(encoding_standard.encoded_word_sep) > 0):
+        if(encoding_standard.encoded_char_sep in encoded_char and len(encoding_standard.encoded_char_sep) > 0):
             session.close()
-            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
+            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain character separator"})
 
     session.add(EncodingStandard(
         name = encoding_standard.name,
@@ -87,7 +81,6 @@ def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...
         allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
         encoded_char_len = encoding_standard.encoded_char_len,
         encoded_char_sep = encoding_standard.encoded_char_sep,
-        encoded_word_sep = encoding_standard.encoded_word_sep,
         charset = encoding_standard.charset
     ))
 

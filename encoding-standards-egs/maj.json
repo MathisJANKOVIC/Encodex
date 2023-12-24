@@ -4,7 +4,6 @@
     "allowed_unrefenced_chars": true,
     "encoded_char_len": null,
     "encoded_char_sep": ".",
-    "encoded_word_sep": " ",
     "charset": {
         "a": "A",
         "b": "B",
@@ -15,7 +14,7 @@
         "g": "GGG",
         "h": "H",
         "i": "I",
-        "j": "J",
+        "j": "JJ",
         "k": "K",
         "l": "L",
         "m": "MM",
@@ -23,7 +22,7 @@
         "o": "OO",
         "p": "P",
         "q": "Q",
-        "r": "R",
+        "r": "RR",
         "s": "S",
         "t": "T",
         "u": "U",
@@ -33,5 +32,4 @@
         "y": "Y",
         "z": "Z"
     }
-
 }

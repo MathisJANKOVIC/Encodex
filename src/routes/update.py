@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 
 from database.connection import LocalSession
-from database.models import EncodingType, EncodingChar
+from database.models import EncodingStandard, CodePoint
 
 class BodyModel(BaseModel):
     encoding_chars: dict
@@ -14,7 +14,7 @@ router = APIRouter()
 def update_encoding_char(encoding_type_name: str, body: BodyModel = Body(...)):
 
     session = LocalSession()
-    encoding_type: EncodingType = session.query(EncodingType).filter(EncodingType.name == encoding_type_name).first()
+    encoding_type: EncodingStandard = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
 
     if(encoding_type is None):
         session.close()
@@ -27,14 +27,14 @@ def update_encoding_char(encoding_type_name: str, body: BodyModel = Body(...)):
         if(len(encoded_char) == 0):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
-        if(encoding_type.encoded_chars_sep != "" and encoding_type.encoded_chars_sep in encoded_char or encoding_type.encoded_words_sep != "" and encoding_type.encoded_words_sep in encoded_char):
+        if(encoding_type.encoded_char_sep != "" and encoding_type.encoded_char_sep in encoded_char or encoding_type.encoded_word_sep != "" and encoding_type.encoded_words_sep in encoded_char):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
 
-        existing_encoding_char = session.query(EncodingChar).filter(EncodingChar.char == char and EncodingChar.encoding_type_id == encoding_type.id).first()
+        existing_encoding_char = session.query(CodePoint).filter(CodePoint.char == char and CodePoint.encoding_standard_id == encoding_type.id).first()
 
         if(existing_encoding_char is None):
-            encoding_type.encoding_chars.append(EncodingChar(char, encoded_char))
+            encoding_type.charset.append(CodePoint(char, encoded_char))
         else:
             existing_encoding_char.encoded_char = encoded_char
 

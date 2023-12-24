@@ -4,7 +4,6 @@
     "allowed_unrefenced_chars": false,
     "encoded_char_len": null,
     "encoded_char_sep": " ",
-    "encoded_word_sep": " / ",
     "charset": {
         "a": ".-",
         "b": "-...",
@@ -59,6 +58,7 @@
         "$": "...-..-",
         "@": ".--.-.",
         "+": ".-.-.",
-        "=": "-...-"
+        "=": "-...-",
+        " ": "/"
     }
 }
