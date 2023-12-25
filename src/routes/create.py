@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
@@ -10,8 +8,8 @@ from database.connection import LocalSession
 class EncodingStandardModel(BaseModel):
     name: str
     case_sensitive: bool
-    allowed_unrefenced_chars: Optional[bool] = False
-    encoded_char_len: Optional[int] = None
+    allowed_unrefenced_chars: bool
+    encoded_char_len: int | None = None
     encoded_char_sep: str
     charset: dict[str, str]
 
