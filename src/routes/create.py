@@ -1,28 +1,36 @@
+from math import e
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 from database.models import EncodingStandard
 from database.connection import LocalSession
 
 class CreateEncodingStandard(BaseModel):
     name: str = Field(...,
-        description="Name of the encoding standard"
+        description = "Name of the encoding standard",
+        example = "Maj"
     )
     case_sensitive: bool = Field(...,
-        description="Whether the encoding standard is case sensitive or not, if true, 'a' and 'A' will be treated as different characters"
+        description = "Whether the encoding standard is case sensitive or not, if true, 'a' and 'A' will be treated as different characters",
+        example = True
     )
     allowed_unrefenced_chars: bool = Field(...,
-        description="Behavior when a character is not defined in the encoding standard while encoding or decoding. If true, the character will be kept, if false, an exception will be raised"
+        description = "Behavior when a character is not defined in the encoding standard while encoding or decoding. If true, the character will be kept, if false, an exception will be raised",
+        example = True
     )
     encoded_char_len: int | None = Field(None,
-        description="Length of all encoded characters. If null, encoded characters won't have a fixed length."
+        description = "Length of all encoded characters. If null, encoded characters won't have a fixed length.",
+        example = 1
     )
     encoded_char_sep: str = Field(...,
-        description="Separator of the encoded characters. Can be empty only if 'encoded_char_len' is defined."
+        description="Separator of the encoded characters. Can be empty only if 'encoded_char_len' is defined.",
+        example = " "
     )
     charset: dict[str, str] = Field(...,
-        description="Dictionary mapping characters to their encoded representations."
+        description="Dictionary mapping characters to their encoded representations.",
+        example = {"a": "A", "b": "B", "c": "C"}
     )
 
 router = APIRouter()
@@ -31,8 +39,11 @@ router = APIRouter()
 def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(...)):
 
     with LocalSession() as session:
-        if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
-            raise HTTPException(status_code=409, detail=f"Encoding standard '{encoding_standard.name}' already exists")
+        try:
+            if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
+                raise HTTPException(status_code=409, detail=f"Encoding standard '{encoding_standard.name}' already exists")
+        except SQLAlchemyError:
+            raise HTTPException(status_code=500, detail="An unexpected error has occured with the database")
 
         if(len(encoding_standard.name) < 3):
             raise HTTPException(status_code=422, detail="Encoding standard name cannot have less than 3 characters")
@@ -60,7 +71,7 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
                 if(encoded_char == ""):
                     raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
             elif(len(encoded_char) != encoding_standard.encoded_char_len):
-                raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in character encoding standard")
+                raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in encoding standard")
 
             if(encoding_standard.encoded_char_sep != "" and encoding_standard.encoded_char_sep in encoded_char):
                 raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
@@ -75,4 +86,4 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
         ))
 
         session.commit()
-    raise JSONResponse(status_code=201, content="Character encoding standard created successfully")
+    raise JSONResponse(status_code=201, content="Encoding standard created successfully")
