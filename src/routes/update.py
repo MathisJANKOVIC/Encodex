@@ -6,40 +6,51 @@ from database.connection import LocalSession
 from database.models import EncodingStandard, CodePoint
 
 class BodyModel(BaseModel):
+    encoding_standard_name: str
     encoding_chars: dict
 
 router = APIRouter()
 
-@router.patch("/encodex/{encoding_type_name}/update/")
-def update_encoding_char(encoding_type_name: str, body: BodyModel = Body(...)):
+@router.patch("/encodex/update/")
+def update_encoding_standard(body: BodyModel = Body(...)):
 
     session = LocalSession()
-    encoding_type: EncodingStandard = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
+    encoding_standard: EncodingStandard = session.query(EncodingStandard).filter(EncodingStandard.name == body.encoding_standard_name ).first()
 
-    if(encoding_type is None):
+    if(encoding_standard is None):
         session.close()
-        return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding type not found"})
+        return JSONResponse(status_code=404, content={"succes": False, "message": "Encoding standard not found"})
 
     for char, encoded_char in body.encoding_chars.items():
+        if(encoded_char in encoding_standard.dict["charset"].values()):
+            session.close()
+            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters must be unique"})
+
         if(len(char) != 1):
             session.close()
-            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoding characters keys must be one character long"})
+            return JSONResponse(status_code=422, content={"succes": False, "message": "Characters must be one character long"})
+
         if(len(encoded_char) == 0):
             session.close()
             return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
-        if(encoding_type.encoded_char_sep != "" and encoding_type.encoded_char_sep in encoded_char or encoding_type.encoded_word_sep != "" and encoding_type.encoded_words_sep in encoded_char):
+
+        if(len(encoded_char) != encoding_standard.encoded_char_len and encoding_standard.encoded_char_len is not None):
             session.close()
-            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain separators"})
+            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters lenght must be the same as defined in character encoding standard"})
 
-        existing_encoding_char = session.query(CodePoint).filter(CodePoint.char == char and CodePoint.encoding_standard_id == encoding_type.id).first()
+        if(encoding_standard.encoded_char_sep in encoded_char):
+            session.close()
+            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain character separator"})
 
-        if(existing_encoding_char is None):
-            encoding_type.charset.append(CodePoint(char, encoded_char))
+        similar_existing_char = session.query(CodePoint).filter(CodePoint.char == char and CodePoint.encoding_standard_id == encoding_standard.id).first()
+
+        if(similar_existing_char is None):
+            encoding_standard.charset.append(CodePoint(char, encoded_char))
         else:
-            existing_encoding_char.encoded_char = encoded_char
+            similar_existing_char.encoded_char = encoded_char
 
-    session.add(encoding_type)
+    session.add(encoding_standard)
     session.commit()
-
     session.close()
-    return JSONResponse(status_code=200, content={"succes": True, "message": "Encoding type updated successfully"})
+
+    return JSONResponse(status_code=200, content={"succes": True, "message": "Encoding standard updated successfully"})
