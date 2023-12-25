@@ -1,88 +1,78 @@
-from pydantic import BaseModel
-from fastapi import APIRouter, Body
+from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import JSONResponse
 
 from database.models import EncodingStandard
 from database.connection import LocalSession
 
-class EncodingStandardModel(BaseModel):
-    name: str
-    case_sensitive: bool
-    allowed_unrefenced_chars: bool
-    encoded_char_len: int | None = None
-    encoded_char_sep: str
-    charset: dict[str, str]
+class CreateEncodingStandard(BaseModel):
+    name: str = Field(...,
+        description="Name of the encoding standard"
+    )
+    case_sensitive: bool = Field(...,
+        description="Whether the encoding standard is case sensitive or not, if true, 'a' and 'A' will be treated as different characters"
+    )
+    allowed_unrefenced_chars: bool = Field(...,
+        description="Behavior when a character is not defined in the encoding standard while encoding or decoding. If true, the character will be kept, if false, an exception will be raised"
+    )
+    encoded_char_len: int | None = Field(None,
+        description="Length of all encoded characters. If null, encoded characters won't have a fixed length."
+    )
+    encoded_char_sep: str = Field(...,
+        description="Separator of the encoded characters. Can be empty only if 'encoded_char_len' is defined."
+    )
+    charset: dict[str, str] = Field(...,
+        description="Dictionary mapping characters to their encoded representations."
+    )
 
 router = APIRouter()
 
 @router.post("/encodex/create/")
-def create_encoding_standard(encoding_standard: EncodingStandardModel = Body(...)):
+def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(...)):
 
-    session = LocalSession()
+    with LocalSession() as session:
+        if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
+            raise HTTPException(status_code=409, detail=f"Encoding standard '{encoding_standard.name}' already exists")
 
-    if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
-        session.close()
-        return JSONResponse(status_code=409, content={
-            "succes": False,
-            "message": f"Character encoding standard `{encoding_standard.name}` already exists"
-        })
+        if(len(encoding_standard.name) < 3):
+            raise HTTPException(status_code=422, detail="Encoding standard name cannot have less than 3 characters")
 
-    if(len(encoding_standard.name) < 3):
-        session.close()
-        return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name must have at least 3 characters"})
+        if(len(encoding_standard.name) > 32):
+            raise HTTPException(status_code=422, detail="Encoding standard name cannot have more than 32 characters")
 
-    if(len(encoding_standard.name) > 64):
-        session.close()
-        return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name must have at most 64 characters"})
+        if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
+            raise HTTPException(status_code=422, detail="Encoding standard name cannot contain special characters")
 
-    if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
-        session.close()
-        return JSONResponse(status_code=422, content={"succes": False, "message": "Character encoding standard name cannot contain special characters"})
+        if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
+            raise HTTPException(status_code=422, detail="Encoded characters must be unique")
 
-    if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
-        session.close()
-        return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters must be unique"})
+        if(encoding_standard.encoded_char_len is None and encoding_standard.encoded_char_sep == ""):
+            raise HTTPException(status_code=422, detail="encoded_char_len and encoded_char_sep cannot be both undefined or empty for an encoding standard")
 
-    if(encoding_standard.encoded_char_len is None and encoding_standard.encoded_char_len == ""):
-        session.close()
-        return JSONResponse(status_code=422, content={
-            "succes": False,
-            "message": "Encoded characters lenght or separator must be defined in character encoding standard"
-        })
+        if(not encoding_standard.case_sensitive):
+            encoding_standard.charset = {char.lower(): encoded_char for char, encoded_char in encoding_standard.charset.items()}
 
-    if(not encoding_standard.case_sensitive):
-        encoding_standard.charset = {char.lower(): encoded_char for char, encoded_char in encoding_standard.charset.items()}
+        for char, encoded_char in encoding_standard.charset.items():
+            if(len(char) != 1):
+                raise HTTPException(status_code=422, detail="Characters must be one character long")
 
-    for char, encoded_char in encoding_standard.charset.items():
-        if(len(char) != 1):
-            session.close()
-            return JSONResponse(status_code=422, content={"succes": False, "message": "Characters must be one character long"})
+            if(encoding_standard.encoded_char_len is None):
+                if(encoded_char == ""):
+                    raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
+            elif(len(encoded_char) != encoding_standard.encoded_char_len):
+                raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in character encoding standard")
 
-        if(encoding_standard.encoded_char_len is None):
-            if(len(encoded_char) == 0):
-                session.close()
-                return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot be empty"})
-        elif(len(encoded_char) != encoding_standard.encoded_char_len):
-            session.close()
-            return JSONResponse(status_code=422, content={
-                "succes": False,
-                "message": "Encoded characters lenght must be the same as defined in character encoding standard"
-            })
+            if(encoding_standard.encoded_char_sep != "" and encoding_standard.encoded_char_sep in encoded_char):
+                raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
 
-        if(encoding_standard.encoded_char_sep in encoded_char and len(encoding_standard.encoded_char_sep) > 0):
-            session.close()
-            return JSONResponse(status_code=422, content={"succes": False, "message": "Encoded characters cannot contain character separator"})
+        session.add(EncodingStandard(
+            name = encoding_standard.name,
+            case_sensitive = encoding_standard.case_sensitive,
+            allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
+            encoded_char_len = encoding_standard.encoded_char_len,
+            encoded_char_sep = encoding_standard.encoded_char_sep,
+            charset = encoding_standard.charset
+        ))
 
-    session.add(EncodingStandard(
-        name = encoding_standard.name,
-        case_sensitive = encoding_standard.case_sensitive,
-        allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
-        encoded_char_len = encoding_standard.encoded_char_len,
-        encoded_char_sep = encoding_standard.encoded_char_sep,
-        charset = encoding_standard.charset
-    ))
-
-    session.commit()
-    session.close()
-
-    return JSONResponse(status_code=201, content={"succes": True, "message": "Character encoding standard created successfully"})
+        session.commit()
+    raise JSONResponse(status_code=201, content="Character encoding standard created successfully")
