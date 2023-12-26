@@ -19,7 +19,7 @@ def encode_string(body: EncodeString = Body(...)):
         try:
             encoding_standard: EncodingStandard = session.query(EncodingStandard).filter(EncodingStandard.name == body.encoding_standard_name).first()
         except SQLAlchemyError:
-            return JSONResponse(status_code=500, detail="An unexpected error has occured with the database")
+            return JSONResponse(status_code=500, detail="An error occured with the database")
 
         if(encoding_standard is None):
             raise HTTPException(status_code=404, detail="Encoding standard not found")

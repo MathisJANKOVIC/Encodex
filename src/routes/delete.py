@@ -21,6 +21,6 @@ def delete_encoding_standard(encoding_type_name: str):
             session.commit()
 
         except SQLAlchemyError:
-            raise HTTPException(status_code=500, detail="An unexpected error has occured with the database")
+            raise HTTPException(status_code=500, detail="An error occured with the database")
 
     return JSONResponse(status_code=200, content={"detail": f"Encoding standard '{encoding_type_name}' deleted successfully"})

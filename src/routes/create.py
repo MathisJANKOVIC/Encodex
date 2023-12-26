@@ -92,6 +92,6 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
             session.commit()
 
         except SQLAlchemyError:
-            raise HTTPException(status_code=500, detail="An unexpected error has occured with the database")
+            raise HTTPException(status_code=500, detail="An error occured with the database")
 
     return JSONResponse(status_code=201, content={"detail": f"Encoding standard '{encoding_standard.name}' created successfully"})
