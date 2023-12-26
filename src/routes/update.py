@@ -13,7 +13,7 @@ class UpdateEncodingStandard(BaseModel):
     )
     encoding_chars: dict = Field(...,
         description = "Dictionary mapping characters to their encoded representations to add or replace in the encoding standard",
-        example = {"a": "A", "b": "B", "c": "C"}
+        example = {"a": "0xE1", "b": "0xE2", "c": "0xE3"}
     )
 
 router = APIRouter()

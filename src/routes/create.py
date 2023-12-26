@@ -24,7 +24,7 @@ class CreateEncodingStandard(BaseModel):
         example = 1
     )
     encoded_char_sep: str = Field(...,
-        description="Separator of the encoded characters. Can be empty only if 'encoded_char_len' is defined.",
+        description = "Separator of the encoded characters. Can be empty only if 'encoded_char_len' is defined.",
         example = " "
     )
     charset: dict[str, str] = Field(...,

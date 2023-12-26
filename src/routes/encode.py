@@ -8,7 +8,7 @@ from database.connection import LocalSession
 
 class EncodeString(BaseModel):
     encoding_standard_name: str = Field(..., description="Name of the encoding standard to use", example="Morse")
-    string: str = Field(..., description="Stringto encode", example="This a string to encode")
+    string: str = Field(..., description="String to encode", example="This a string to encode")
 
 router = APIRouter()
 
@@ -33,13 +33,13 @@ def encode_string(body: EncodeString = Body(...)):
 
             if(encoded_char is None):
                 if(encoding_standard.allowed_unrefenced_chars):
-                    encoded_string = encoded_string + char
+                    encoded_string += char
                 else:
                     raise HTTPException(status_code=422, detail=f"Failed to encode character '{char}'")
             else:
-                encoded_string = encoded_string + encoded_char
+                encoded_string += encoded_char
 
             if(i+1 < len(body.string)):
-                encoded_string = encoded_string + encoding_standard.encoded_char_sep
+                encoded_string += encoding_standard.encoded_char_sep
 
     return JSONResponse(status_code=200, content={"encoded_string": encoded_string})
