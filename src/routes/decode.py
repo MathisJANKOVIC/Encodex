@@ -7,8 +7,8 @@ from database.connection import LocalSession
 from database.models import EncodingStandard
 
 class DecodeString(BaseModel):
-    encoding_standard_name: str = Field(..., description="Name of the encoding standard to use", example="ASCII")
-    encoded_string: str = Field(..., description="String encoded with the encoding standard", example="54 68 69 73 20 61 20 73 74 72 69 6E 67 20 74 6F 20 65 6E 63 6F 64 65")
+    encoding_standard_name: str = Field(..., description="Name of the encoding standard to use", example="ASCII-hexa")
+    encoded_string: str = Field(..., description="String encoded with the encoding standard", example="54 68 69 73 20 61 20 73 74 72 69 6E 67 20 74 6F 20 64 65 63 6F 64 65")
 
 router = APIRouter()
 

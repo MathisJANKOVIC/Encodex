@@ -9,11 +9,11 @@ from database.models import EncodingStandard, CodePoint
 class UpdateEncodingStandard(BaseModel):
     encoding_standard_name: str = Field(...,
         description = "Name of the encoding standard to update",
-        example = "ISO-8859-8"
+        example = "ASCII-hexa"
     )
-    encoding_chars: dict = Field(...,
+    charset: dict[str, str] = Field(...,
         description = "Dictionary mapping characters to their encoded representations to add or replace in the encoding standard",
-        example = {"a": "0xE1", "b": "0xE2", "c": "0xE3"}
+        example = {"+": "2B", "=": "3D", "|": "7C", "~": "7E"}
     )
 
 router = APIRouter()
@@ -28,9 +28,9 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
             if(encoding_standard is None):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
-            for char, encoded_char in body.encoding_chars.items():
-                if(encoded_char in encoding_standard.dict["charset"].values()):
-                    raise HTTPException(status_code=422, detail="Encoded characters must be unique")
+            for char, encoded_char in body.charset.items():
+                if(encoded_char in encoding_standard.dict["charset"].values() and encoded_char not in encoding_standard.dict["charset"].get(char, "")):
+                    raise HTTPException(status_code=422, detail=f"Encoded character '{encoded_char}' is not unique in the encoding standard charset")
 
                 if(len(char) != 1):
                     raise HTTPException(status_code=422, detail="Characters must be one character long")
@@ -57,4 +57,4 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An unexpected error has occured with the database")
 
-    return JSONResponse(status_code=200, content={"detail": f"Encoding standard '{encoding_standard.name}' updated successfully"})
+    return JSONResponse(status_code=200, content={"detail": f"Encoding standard '{body.encoding_standard_name}' updated successfully"})

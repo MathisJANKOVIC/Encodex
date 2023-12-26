@@ -6,7 +6,7 @@ from database import connection
 Base = declarative_base()
 
 class CodePoint(Base):
-    __tablename__ = 'code_points'
+    __tablename__ = 'charsets'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
 
@@ -31,7 +31,7 @@ class EncodingStandard(Base):
     encoded_char_len = Column(Integer)
     encoded_char_sep = Column(String(255), nullable=False)
 
-    charset = relationship('CodePoint', backref='encoding_standards')
+    charset = relationship('CodePoint', backref='encoding_standards', cascade="all, delete-orphan")
 
     def __init__(self,
             name: str,

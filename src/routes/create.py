@@ -9,7 +9,7 @@ from database.connection import LocalSession
 class CreateEncodingStandard(BaseModel):
     name: str = Field(...,
         description = "Name of the encoding standard",
-        example = "Maj"
+        example = "ASCII-hexa"
     )
     case_sensitive: bool = Field(...,
         description = "Whether the encoding standard is case sensitive or not, if true, 'a' and 'A' will be treated as different characters",
@@ -17,19 +17,27 @@ class CreateEncodingStandard(BaseModel):
     )
     allowed_unrefenced_chars: bool = Field(...,
         description = "Behavior when a character is not defined in the encoding standard while encoding or decoding. If true, the character will be kept, if false, an exception will be raised",
-        example = True
+        example = False
     )
     encoded_char_len: int | None = Field(None,
         description = "Length of all encoded characters. If null, encoded characters won't have a fixed length.",
-        example = 1
+        example = 2
     )
     encoded_char_sep: str = Field(...,
         description = "Separator of the encoded characters. Can be empty only if 'encoded_char_len' is defined.",
         example = " "
     )
     charset: dict[str, str] = Field(...,
-        description="Dictionary mapping characters to their encoded representations.",
-        example = {"a": "A", "b": "B", "c": "C"}
+        description = "Dictionary mapping characters to their encoded representations in the encoding standard",
+        example = {
+            "!": "21", "$": "24", "%": "25", "&": "26", "'": "27", "(": "28", ")": "29", "*": "2A", ",": "2C", "-": "2D", "{": "7B", "}": "7D", ":": "3A",
+            ".": "2E", "/": "2F", "0": "30", "1": "31", "2": "32", "3": "33", "4": "34", "5": "35", "6": "36", "7": "37", "8": "38", "9": "39", " ": "20",
+            ";": "3B", "<": "3C", "=": "3D", ">": "3E", "?": "3F", "@": "40", "A": "41", "B": "42", "C": "43", "D": "44", "E": "45", "F": "46", "G": "47",
+            "H": "48", "I": "49", "J": "4A", "K": "4B", "L": "4C", "M": "4D", "N": "4E", "O": "4F", "P": "50", "Q": "51", "R": "52", "S": "53","T": "54",
+            "U": "55", "V": "56", "W": "57", "X": "58", "Y": "59", "Z": "5A", "[": "5B", "\\": "5C", "]": "5D", "^": "5E", "_": "5F", "`": "60", "a": "61",
+            "b": "62", "c": "63", "d": "64", "e": "65", "f": "66", "g": "67", "h": "68", "i": "69", "j": "6A", "k": "6B", "l": "6C", "m": "6D","n": "6E",
+            "o": "6F", "p": "70", "q": "71", "r": "72", "s": "73", "t": "74", "u": "75", "v": "76", "w": "77", "x": "78", "y": "79", "z": "7A", "#": "23",
+        }
     )
 
 router = APIRouter()
