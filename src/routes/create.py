@@ -1,4 +1,3 @@
-from math import e
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import JSONResponse
@@ -42,48 +41,49 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
         try:
             if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
                 raise HTTPException(status_code=409, detail=f"Encoding standard '{encoding_standard.name}' already exists")
+
+            if(len(encoding_standard.name) < 3):
+                raise HTTPException(status_code=422, detail="Encoding standard name cannot have less than 3 characters")
+
+            if(len(encoding_standard.name) > 32):
+                raise HTTPException(status_code=422, detail="Encoding standard name cannot have more than 32 characters")
+
+            if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
+                raise HTTPException(status_code=422, detail="Encoding standard name cannot contain special characters")
+
+            if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
+                raise HTTPException(status_code=422, detail="Encoded characters must be unique")
+
+            if(encoding_standard.encoded_char_len is None and encoding_standard.encoded_char_sep == ""):
+                raise HTTPException(status_code=422, detail="encoded_char_len and encoded_char_sep cannot be both undefined or empty for an encoding standard")
+
+            if(not encoding_standard.case_sensitive):
+                encoding_standard.charset = {char.lower(): encoded_char for char, encoded_char in encoding_standard.charset.items()}
+
+            for char, encoded_char in encoding_standard.charset.items():
+                if(len(char) != 1):
+                    raise HTTPException(status_code=422, detail="Characters must be one character long")
+
+                if(encoding_standard.encoded_char_len is None):
+                    if(encoded_char == ""):
+                        raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
+                elif(len(encoded_char) != encoding_standard.encoded_char_len):
+                    raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in encoding standard")
+
+                if(encoding_standard.encoded_char_sep != "" and encoding_standard.encoded_char_sep in encoded_char):
+                    raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
+
+            session.add(EncodingStandard(
+                name = encoding_standard.name,
+                case_sensitive = encoding_standard.case_sensitive,
+                allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
+                encoded_char_len = encoding_standard.encoded_char_len,
+                encoded_char_sep = encoding_standard.encoded_char_sep,
+                charset = encoding_standard.charset
+            ))
+            session.commit()
+
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An unexpected error has occured with the database")
 
-        if(len(encoding_standard.name) < 3):
-            raise HTTPException(status_code=422, detail="Encoding standard name cannot have less than 3 characters")
-
-        if(len(encoding_standard.name) > 32):
-            raise HTTPException(status_code=422, detail="Encoding standard name cannot have more than 32 characters")
-
-        if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
-            raise HTTPException(status_code=422, detail="Encoding standard name cannot contain special characters")
-
-        if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
-            raise HTTPException(status_code=422, detail="Encoded characters must be unique")
-
-        if(encoding_standard.encoded_char_len is None and encoding_standard.encoded_char_sep == ""):
-            raise HTTPException(status_code=422, detail="encoded_char_len and encoded_char_sep cannot be both undefined or empty for an encoding standard")
-
-        if(not encoding_standard.case_sensitive):
-            encoding_standard.charset = {char.lower(): encoded_char for char, encoded_char in encoding_standard.charset.items()}
-
-        for char, encoded_char in encoding_standard.charset.items():
-            if(len(char) != 1):
-                raise HTTPException(status_code=422, detail="Characters must be one character long")
-
-            if(encoding_standard.encoded_char_len is None):
-                if(encoded_char == ""):
-                    raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
-            elif(len(encoded_char) != encoding_standard.encoded_char_len):
-                raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in encoding standard")
-
-            if(encoding_standard.encoded_char_sep != "" and encoding_standard.encoded_char_sep in encoded_char):
-                raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
-
-        session.add(EncodingStandard(
-            name = encoding_standard.name,
-            case_sensitive = encoding_standard.case_sensitive,
-            allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
-            encoded_char_len = encoding_standard.encoded_char_len,
-            encoded_char_sep = encoding_standard.encoded_char_sep,
-            charset = encoding_standard.charset
-        ))
-
-        session.commit()
-    raise JSONResponse(status_code=201, content="Encoding standard created successfully")
+    return JSONResponse(status_code=201, content={"detail": f"Encoding standard '{encoding_standard.name}' created successfully"})

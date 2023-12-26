@@ -1,44 +1,45 @@
-from pydantic import BaseModel
-from fastapi import APIRouter, Body
+from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 from database.models import EncodingStandard
 from database.connection import LocalSession
 
-class BodyModel(BaseModel):
-    encoding_standard_name: str
-    string: str
+class EncodeString(BaseModel):
+    encoding_standard_name: str = Field(..., description="Name of the encoding standard to use", example="Morse")
+    string: str = Field(..., description="Stringto encode", example="This a string to encode")
 
 router = APIRouter()
 
 @router.post("/encodex/encode/")
-def encode_string(body: BodyModel = Body(...)):
+def encode_string(body: EncodeString = Body(...)):
 
-    session = LocalSession()
-    encoding_standard: EncodingStandard = session.query(EncodingStandard).filter(EncodingStandard.name == body.encoding_standard_name).first()
+    with LocalSession() as session:
+        try:
+            encoding_standard: EncodingStandard = session.query(EncodingStandard).filter(EncodingStandard.name == body.encoding_standard_name).first()
+        except SQLAlchemyError:
+            return JSONResponse(status_code=500, detail="An unexpected error has occured with the database")
 
-    if(encoding_standard is None):
-        session.close()
-        return JSONResponse(status_code=404, content={"succes": False, "message": "Character encoding standard not found"})
+        if(encoding_standard is None):
+            raise HTTPException(status_code=404, detail="Encoding standard not found")
 
-    encoded_string = ""
-    for i, char in enumerate(body.string):
-        if(not encoding_standard.case_sensitive):
-            char = char.lower()
+        encoded_string = ""
+        for i, char in enumerate(body.string):
+            if(not encoding_standard.case_sensitive):
+                char = char.lower()
 
-        encoded_char = encoding_standard.encode(char)
+            encoded_char = encoding_standard.encode(char)
 
-        if(encoded_char is None):
-            if(encoding_standard.allowed_unrefenced_chars):
-                encoded_string = encoded_string + char
+            if(encoded_char is None):
+                if(encoding_standard.allowed_unrefenced_chars):
+                    encoded_string = encoded_string + char
+                else:
+                    raise HTTPException(status_code=422, detail=f"Failed to encode character '{char}'")
             else:
-                session.close()
-                return JSONResponse(status_code=422, content={"succes": False, "message": f"Coulnd't encode character `{char}`"})
-        else:
-            encoded_string = encoded_string + encoded_char
+                encoded_string = encoded_string + encoded_char
 
-        if(i+1 < len(body.string)):
-            encoded_string = encoded_string + encoding_standard.encoded_char_sep
+            if(i+1 < len(body.string)):
+                encoded_string = encoded_string + encoding_standard.encoded_char_sep
 
-    session.close()
-    return JSONResponse(status_code=200, content={"succes": True, "content": encoded_string})
+    return JSONResponse(status_code=200, content={"encoded_string": encoded_string})

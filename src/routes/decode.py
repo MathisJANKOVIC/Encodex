@@ -44,8 +44,8 @@ def decode_string(body: DecodeString = Body(...)):
                 if(encoding_standard.allowed_unrefenced_chars):
                     decoded_string += encoded_char
                 else:
-                    raise HTTPException(status_code=400, detail=f"{encoded_char} is not a valid encoded character")
+                    raise HTTPException(status_code=422, detail=f"Failed to decode '{encoded_char}'")
             else:
                 decoded_string += decoded_char
 
-        return JSONResponse(status_code=200, content={"content": decoded_string})
+    return JSONResponse(status_code=200, content={"decoded_string": decoded_string})
