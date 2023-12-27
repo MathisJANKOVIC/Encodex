@@ -31,7 +31,7 @@ class EncodingStandard(Base):
     encoded_char_len = Column(Integer)
     encoded_char_sep = Column(String(255), nullable=False)
 
-    charset = relationship('CodePoint', backref='encoding_standards', cascade="all, delete-orphan")
+    charset = relationship('CodePoint', backref='encoding_standards')
 
     def __init__(self,
             name: str,
