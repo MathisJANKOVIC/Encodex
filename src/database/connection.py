@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 DRIVERS = "mysql+pymysql"
 USER = "root"
 PASSWORD = ""
-HOST = "database"
+HOST = "db"
 PORT = "3306"
 DATABASE = "encodex"
 
