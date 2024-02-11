@@ -3,17 +3,19 @@ services:
   api:
     image: fastapi
     container_name: encodex-fastapi
-
     build:
       context: .
     ports:
       - 8000:80
     volumes:
       - .:/app
-
     environment:
+      DB_HOST: 'db'
+      DB_PORT: '3306'
+      DB_USER: 'root'
+      DB_PASSWORD: ''
+      DB_NAME: 'encodex'
       PYTHONPATH: /app/src
-
     depends_on:
       - db
     networks:
@@ -22,26 +24,21 @@ services:
   db:
     image: mysql
     container_name: encodex-mysql
-
     volumes:
       - database:/var/lib/mysql
-
     environment:
       MYSQL_DATABASE: 'encodex'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-
     networks:
       - encodex-network
 
   db-manager:
     image: phpmyadmin
     container_name: encodex-phpmyadmin
-
     ports:
-      - 8080:80
+      - 80:80
     environment:
       PMA_HOST: db
-
     depends_on:
       - db
     networks:
