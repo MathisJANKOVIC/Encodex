@@ -10,6 +10,8 @@ services:
     volumes:
       - .:/app
     environment:
+      HOST: 'api'
+      PORT: '80'
       DB_HOST: 'db'
       DB_PORT: '3306'
       DB_USER: 'root'
