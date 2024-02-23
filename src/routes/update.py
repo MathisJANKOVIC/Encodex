@@ -29,7 +29,7 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
             for char, encoded_char in body.charset.items():
-                if(encoded_char in encoding_standard.dict["charset"].values() and encoded_char not in encoding_standard.dict["charset"].get(char, "")):
+                if(encoded_char in encoding_standard.dict()["charset"].values() and encoded_char not in encoding_standard.dict()["charset"].get(char, "")):
                     raise HTTPException(status_code=422, detail=f"Encoded character '{encoded_char}' is not unique in the encoding standard charset")
 
                 if(len(char) != 1):

@@ -16,7 +16,7 @@ def get_all_encoding_standards():
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-        encoding_standards_dict = [encoding_standard.dict for encoding_standard in encoding_standards]
+        encoding_standards_dict = [encoding_standard.dict() for encoding_standard in encoding_standards]
 
     return JSONResponse(status_code=200, content={"content": encoding_standards_dict})
 
@@ -32,6 +32,6 @@ def get_encoding_standard(encoding_type_name: str):
         if(encoding_standard is None):
             raise HTTPException(status_code=404, detail="Encoding standard not found")
 
-        encoding_standard_dict = encoding_standard.dict
+        encoding_standard_dict = encoding_standard.dict()
 
     return JSONResponse(status_code=200, content={"content": encoding_standard_dict})

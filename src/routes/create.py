@@ -53,8 +53,8 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
             if(len(encoding_standard.name) < 3):
                 raise HTTPException(status_code=422, detail="Encoding standard name cannot have less than 3 characters")
 
-            if(len(encoding_standard.name) > 32):
-                raise HTTPException(status_code=422, detail="Encoding standard name cannot have more than 32 characters")
+            if(len(encoding_standard.name) > 36):
+                raise HTTPException(status_code=422, detail="Encoding standard name cannot have more than 36 characters")
 
             if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
                 raise HTTPException(status_code=422, detail="Encoding standard name cannot contain special characters")

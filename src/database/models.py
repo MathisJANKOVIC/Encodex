@@ -51,7 +51,6 @@ class EncodingStandard(Base):
         for char, encoding_char in charset.items():
             self.charset.append(CodePoint(char, encoding_char))
 
-    @property
     def dict(self) -> dict:
         """Returns a dictionary representation of the object"""
         return {
@@ -65,11 +64,11 @@ class EncodingStandard(Base):
 
     def encode(self, char: str) -> str | None:
         """Returns the encoded version of `char` if exists in the charset otherwise returns None"""
-        return self.dict['charset'].get(char)
+        return self.dict()['charset'].get(char)  
 
     def decode(self, encoded_char: str) -> str | None:
         """Returns the encoded version of `encoded_char` if exists in the charset otherwise returns None"""
-        for char, encoded_character in self.dict['charset'].items():
+        for char, encoded_character in self.dict()['charset'].items():
             if(encoded_character == encoded_char):
                 return char
         return None
