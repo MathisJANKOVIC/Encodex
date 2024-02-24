@@ -6,21 +6,21 @@ from database import connection
 Base = declarative_base()
 
 class CodePoint(Base):
-    __tablename__ = 'charsets'
+    __tablename__ = 'charset'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
 
     char = Column(String(1), nullable=False)
     encoded_char = Column(String(255), nullable=False)
 
-    encoding_standard_id = Column(Integer, ForeignKey('encoding_standards.id'), nullable=False)
+    encoding_standard_id = Column(Integer, ForeignKey('encoding_standard.id'), nullable=False)
 
     def __init__(self, char: str, encoded_char: str):
         self.char = char
         self.encoded_char = encoded_char
 
 class EncodingStandard(Base):
-    __tablename__ = 'encoding_standards'
+    __tablename__ = 'encoding_standard'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
@@ -31,7 +31,7 @@ class EncodingStandard(Base):
     encoded_char_len = Column(Integer)
     encoded_char_sep = Column(String(255), nullable=False)
 
-    charset = relationship('CodePoint', backref='encoding_standards')
+    charset = relationship('CodePoint', backref='encoding_standard')
 
     def __init__(self,
             name: str,
