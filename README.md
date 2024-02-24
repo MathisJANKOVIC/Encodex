@@ -15,10 +15,7 @@ git clone https://github.com/MathisJANKOVIC/Encodex.git
 # Go to the project directory and setup docker services
 docker compose up -d
 
-# Enter the FastAPI container
-docker exec -it encodex-fastapi bash
-
-# Migrate the database
-python src/database/models.py
+# Apply database schema
+docker exec encodex-fastapi python src/database/models.py
 ```
 You will then be able to see docs and routes at `http://localhost:8000/docs`

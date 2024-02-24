@@ -64,7 +64,7 @@ class EncodingStandard(Base):
 
     def encode(self, char: str) -> str | None:
         """Returns the encoded version of `char` if exists in the charset otherwise returns None"""
-        return self.dict()['charset'].get(char)  
+        return self.dict()['charset'].get(char)
 
     def decode(self, encoded_char: str) -> str | None:
         """Returns the encoded version of `encoded_char` if exists in the charset otherwise returns None"""
