@@ -7,7 +7,7 @@ from database.models import EncodingStandard, CodePoint
 
 router = APIRouter()
 
-@router.delete("/encodex/delete/{encoding_type_name}")
+@router.delete("/encoding-standard/delete/{encoding_type_name}")
 def delete_encoding_standard(encoding_type_name: str):
 
     with LocalSession() as session:

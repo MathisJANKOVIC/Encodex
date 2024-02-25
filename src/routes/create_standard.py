@@ -42,7 +42,7 @@ class CreateEncodingStandard(BaseModel):
 
 router = APIRouter()
 
-@router.post("/encodex/create/")
+@router.post("/encoding-standard/create")
 def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(...)):
 
     with LocalSession() as session:
@@ -72,13 +72,13 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
                 if(len(char) != 1):
                     raise HTTPException(status_code=422, detail="Characters must be one character long")
 
-                if(encoding_standard.encoded_char_len is None):
-                    if(encoded_char == ""):
-                        raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
-                elif(len(encoded_char) != encoding_standard.encoded_char_len):
+                if(encoded_char == ""):
+                    raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
+
+                if(len(encoded_char) != encoding_standard.encoded_char_len and encoding_standard.encoded_char_len is not None):
                     raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in encoding standard")
 
-                if(encoding_standard.encoded_char_sep != "" and encoding_standard.encoded_char_sep in encoded_char):
+                if(encoding_standard.encoded_char_sep in encoded_char and encoding_standard.encoded_char_sep != ""):
                     raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
 
             session.add(EncodingStandard(

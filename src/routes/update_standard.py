@@ -18,7 +18,7 @@ class UpdateEncodingStandard(BaseModel):
 
 router = APIRouter()
 
-@router.patch("/encodex/update/")
+@router.patch("/encoding-standard/update")
 def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
 
     with LocalSession() as session:
@@ -29,7 +29,7 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
             for char, encoded_char in body.charset.items():
-                if(encoded_char in encoding_standard.dict()["charset"].values() and encoded_char not in encoding_standard.dict()["charset"].get(char, "")):
+                if(encoded_char in encoding_standard.dict["charset"].values() and encoded_char not in encoding_standard.dict["charset"].get(char, "")):
                     raise HTTPException(status_code=422, detail=f"Encoded character '{encoded_char}' is not unique in the encoding standard charset")
 
                 if(len(char) != 1):
@@ -41,10 +41,12 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
                 if(len(encoded_char) != encoding_standard.encoded_char_len and encoding_standard.encoded_char_len is not None):
                     raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in character encoding standard")
 
-                if(encoding_standard.encoded_char_sep in encoded_char):
+                if(encoding_standard.encoded_char_sep in encoded_char and encoding_standard.encoded_char_sep != ""):
                     raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
 
-                similar_existing_char = session.query(CodePoint).filter(CodePoint.char == char and CodePoint.encoding_standard_id == encoding_standard.id).first()
+                similar_existing_char = session.query(CodePoint).filter(
+                    CodePoint.char == char and CodePoint.encoding_standard_id == encoding_standard.id
+                ).first()
 
                 if(similar_existing_char is None):
                     encoding_standard.charset.append(CodePoint(char, encoded_char))

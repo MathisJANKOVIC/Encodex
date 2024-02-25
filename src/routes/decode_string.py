@@ -12,7 +12,7 @@ class DecodeString(BaseModel):
 
 router = APIRouter()
 
-@router.post("/encodex/decode/")
+@router.post("/encoding-standard/decode")
 def decode_string(body: DecodeString = Body(...)):
 
     with LocalSession() as session:

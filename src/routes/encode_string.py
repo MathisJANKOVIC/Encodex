@@ -12,7 +12,7 @@ class EncodeString(BaseModel):
 
 router = APIRouter()
 
-@router.post("/encodex/encode/")
+@router.post("/encoding-standard/encode")
 def encode_string(body: EncodeString = Body(...)):
 
     with LocalSession() as session:
