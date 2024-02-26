@@ -81,17 +81,21 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
                 if(encoding_standard.encoded_char_sep in encoded_char and encoding_standard.encoded_char_sep != ""):
                     raise HTTPException(status_code=422, detail="Encoded characters in charset cannot contain encoded_char_sep")
 
-            session.add(EncodingStandard(
+            new_encoding_standard = EncodingStandard(
                 name = encoding_standard.name.strip(),
                 case_sensitive = encoding_standard.case_sensitive,
                 allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
                 encoded_char_len = encoding_standard.encoded_char_len,
                 encoded_char_sep = encoding_standard.encoded_char_sep,
                 charset = encoding_standard.charset
-            ))
+            )
+
+            session.add(new_encoding_standard)
             session.commit()
+
+            new_encoding_standard_dict = new_encoding_standard.dict
 
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-    return JSONResponse(status_code=201, content={"detail": f"Encoding standard '{encoding_standard.name}' created successfully"})
+    return JSONResponse(status_code=201, content={"encoding_standard": new_encoding_standard_dict, "detail": f"Encoding standard '{encoding_standard.name}' created successfully"})
