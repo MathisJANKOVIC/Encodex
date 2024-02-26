@@ -5,9 +5,9 @@ app = FastAPI()
 
 app.include_router(routes.get_standards.router)
 
-app.include_router(routes.encode_string.router)
+app.include_router(routes.encode.router)
 
-app.include_router(routes.decode_string.router)
+app.include_router(routes.decode.router)
 
 app.include_router(routes.create_standard.router)
 

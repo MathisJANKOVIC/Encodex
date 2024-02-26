@@ -1,1 +1,1 @@
-from . import create_standard, delete_standard, encode_string, decode_string, get_standards, update_standard
+from . import create_standard, decode, delete_standard, encode, get_standards, update_standard
