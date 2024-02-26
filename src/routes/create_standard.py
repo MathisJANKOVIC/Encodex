@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
+from pydantic import BaseModel, Field
 
 from database.models import EncodingStandard
 from database.connection import LocalSession
@@ -48,41 +48,41 @@ def create_encoding_standard(encoding_standard: CreateEncodingStandard = Body(..
     with LocalSession() as session:
         try:
             if(session.query(EncodingStandard).filter(EncodingStandard.name == encoding_standard.name).first() is not None):
-                raise HTTPException(status_code=409, detail=f"Encoding standard '{encoding_standard.name}' already exists")
+                raise HTTPException(status_code=409, detail=f"An encoding standard named '{encoding_standard.name}' already exists")
 
             if(len(encoding_standard.name) < 3):
-                raise HTTPException(status_code=422, detail="Encoding standard name cannot have less than 3 characters")
+                raise HTTPException(status_code=422, detail="encoding_standard_name cannot have less than 3 characters")
 
             if(len(encoding_standard.name) > 36):
-                raise HTTPException(status_code=422, detail="Encoding standard name cannot have more than 36 characters")
+                raise HTTPException(status_code=422, detail="encoding_standard_name cannot have more than 36 characters")
 
             if(not encoding_standard.name.replace(" ","").replace("-","").replace("_","").isalnum()):
-                raise HTTPException(status_code=422, detail="Encoding standard name cannot contain special characters")
+                raise HTTPException(status_code=422, detail="encoding_standard_name cannot contain special characters")
 
             if(len(encoding_standard.charset.values()) != len(set(encoding_standard.charset.values()))):
-                raise HTTPException(status_code=422, detail="Encoded characters must be unique")
+                raise HTTPException(status_code=422, detail="Encoded characters in charset must be unique")
 
             if(encoding_standard.encoded_char_len is None and encoding_standard.encoded_char_sep == ""):
-                raise HTTPException(status_code=422, detail="encoded_char_len and encoded_char_sep cannot be both undefined or empty for an encoding standard")
+                raise HTTPException(status_code=422, detail="encoded_char_sep cannot be empty without a defined encoded_char_len")
 
             if(not encoding_standard.case_sensitive):
                 encoding_standard.charset = {char.lower(): encoded_char for char, encoded_char in encoding_standard.charset.items()}
 
             for char, encoded_char in encoding_standard.charset.items():
                 if(len(char) != 1):
-                    raise HTTPException(status_code=422, detail="Characters must be one character long")
+                    raise HTTPException(status_code=422, detail="Characters in charset must be one character long")
 
                 if(encoded_char == ""):
-                    raise HTTPException(status_code=422, detail="Encoded characters cannot be empty")
+                    raise HTTPException(status_code=422, detail="Encoded characters in charset cannot be empty")
 
                 if(len(encoded_char) != encoding_standard.encoded_char_len and encoding_standard.encoded_char_len is not None):
-                    raise HTTPException(status_code=422, detail="Encoded characters lenght must be the same as defined in encoding standard")
+                    raise HTTPException(status_code=422, detail="Encoded characters in charset must have the same length as defined in encoded_char_len")
 
                 if(encoding_standard.encoded_char_sep in encoded_char and encoding_standard.encoded_char_sep != ""):
-                    raise HTTPException(status_code=422, detail="Encoded characters cannot contain character separator")
+                    raise HTTPException(status_code=422, detail="Encoded characters in charset cannot contain encoded_char_sep")
 
             session.add(EncodingStandard(
-                name = encoding_standard.name,
+                name = encoding_standard.name.strip(),
                 case_sensitive = encoding_standard.case_sensitive,
                 allowed_unrefenced_chars = encoding_standard.allowed_unrefenced_chars,
                 encoded_char_len = encoding_standard.encoded_char_len,

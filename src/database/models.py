@@ -26,7 +26,7 @@ class EncodingStandard(Base):
     name = Column(String(255), nullable=False, unique=True)
 
     case_sensitive = Column(Boolean, nullable=False)
-    allowed_unrefenced_chars = Column(Boolean, default=False)
+    allowed_unrefenced_chars = Column(Boolean)
 
     encoded_char_len = Column(Integer)
     encoded_char_sep = Column(String(255), nullable=False)
@@ -55,6 +55,7 @@ class EncodingStandard(Base):
     def dict(self) -> dict:
         """Returns a dictionary representation of the object"""
         return {
+            "id": self.id,
             "name": self.name,
             "case_sensitive": self.case_sensitive,
             "allowed_unrefenced_chars": self.allowed_unrefenced_chars,
