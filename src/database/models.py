@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import Session, relationship, declarative_base
 
@@ -96,7 +97,7 @@ class EncodingStandard(Base):
                 return code_point
 
     @staticmethod
-    def get(session: Session, id: int = None, name: str = None) -> 'EncodingStandard' | None:
+    def get(session: Session, id: int = None, name: str = None) -> EncodingStandard | None:
         """Returns `EncodingStandard` with the given `id` and `name` if exists otherwise returns None"""
         if(id and name):
             return session.query(EncodingStandard).filter(EncodingStandard.id == id).filter(EncodingStandard.name == name).first()
