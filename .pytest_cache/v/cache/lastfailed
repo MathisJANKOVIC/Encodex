@@ -1,19 +1,4 @@
 {
-  "tests/create_test.py::test_create_standard": true,
-  "tests/create_test.py::test_create_duplicate_standard": true,
-  "tests/create_test.py::test_create_standard_with_too_short_name": true,
-  "tests/create_test.py::test_create_standard_with_too_long_name": true,
-  "tests/create_test.py::test_create_standard_with_special_chars_in_name": true,
-  "tests/create_test.py::test_create_standard_with_non_unique_encoded_chars": true,
-  "tests/create_test.py::test_create_standard_with_empty_encoded_char_len_and_sep": true,
-  "tests/create_test.py::test_create_standard_with_empty_char": true,
-  "tests/create_test.py::test_create_standard_with_undefined_encoded_char_len_and_null_encoded_char": true,
-  "tests/create_test.py::test_create_standard_with_encoded_char_len_not_matching": true,
-  "tests/create_test.py::test_create_standard_with_encoded_char_sep_in_encoded_char_and_empty_sep": true,
-  "tests/create_test.py::test_create_encoding_standard_with_an_empty_char": true,
-  "tests/test_encode.py::test_encode2": true,
-  "tests/test_encode.py::test_encode_morse": true,
-  "tests/test_encode.py::test_encode": true,
-  "tests/test_encode.py::test_encode_with_unreferenced_chars": true,
-  "tests/test_encode.py::test_encode_with_non_existent_standard": true
+  "tests/test_get_standards.py::test_get_all_standards_and_check_if_standard_is_in_it": true,
+  "tests/test_get_standards.py::test_get_standard": true
 }

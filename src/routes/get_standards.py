@@ -12,26 +12,25 @@ def get_all_encoding_standards():
 
     with LocalSession() as session:
         try:
-            encoding_standards: list[EncodingStandard] = session.query(EncodingStandard).all()
+            standards: list[EncodingStandard] = EncodingStandard.get(session)
+            standards_dict = [standard.dict for standard in standards]
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-        encoding_standards_dict = [encoding_standard.dict for encoding_standard in encoding_standards]
+    return JSONResponse(status_code=200, content={"content": standards_dict})
 
-    return JSONResponse(status_code=200, content={"content": encoding_standards_dict})
-
-@router.get("/encoding-standard/{encoding_type_name}")
-def get_encoding_standard(encoding_type_name: str):
+@router.get("/encoding-standard/{encoding_standard_id}")
+def get_encoding_standard(encoding_standard_id: int):
 
     with LocalSession() as session:
         try:
-            encoding_standard = session.query(EncodingStandard).filter(EncodingStandard.name == encoding_type_name).first()
+            standard = EncodingStandard.get(session, id=encoding_standard_id)
+
+            if(standard is None):
+                raise HTTPException(status_code=404, detail="Encoding standard not found")
+
+            standard_dict = standard.dict
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-        if(encoding_standard is None):
-            raise HTTPException(status_code=404, detail="Encoding standard not found")
-
-        encoding_standard_dict = encoding_standard.dict
-
-    return JSONResponse(status_code=200, content={"content": encoding_standard_dict})
+    return JSONResponse(status_code=200, content={"content": standard_dict})
