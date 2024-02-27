@@ -7,8 +7,8 @@ from database.models import EncodingStandard
 from database.connection import LocalSession
 
 class EncodeString(BaseModel):
-    encoding_standard_id: int = Field(..., description="Id of the encoding standard to use")
-    string: str = Field(..., description="String to encode")
+    encoding_standard_id: int
+    string: str
 
 router = APIRouter()
 

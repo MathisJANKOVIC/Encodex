@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.connection import LocalSession
-from database.models import EncodingStandard, CodePoint
+from database.models import EncodingStandard
 
 router = APIRouter()
 

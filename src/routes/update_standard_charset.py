@@ -7,8 +7,11 @@ from database.connection import LocalSession
 from database.models import EncodingStandard, CodePoint
 
 class UpdateEncodingStandard(BaseModel):
-    encoding_standard_id: int = Field(..., description = "Id of the encoding standard to update")
-    charset: dict[str, str] = Field(..., description = "Dictionary mapping characters to their encoded representations to add or replace in the encoding standard")
+    encoding_standard_id: int = Field(..., description = "Id of the encoding standard.")
+    charset: dict[str, str] = Field(...,
+        description = """Dictionary mapping characters to their encoded representations to add in the encoding standard.
+        If a character already exists in the charset, its encoded representation will be updated."""
+    )
 
 router = APIRouter()
 
@@ -24,7 +27,10 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
 
             for char, encoded_char in body.charset.items():
                 if(standard.is_encoded_char_used_by_another_char(session, char, encoded_char)):
-                    raise HTTPException(status_code=422, detail=f"Encoded character '{encoded_char}' is not unique in the encoding standard charset")
+                    raise HTTPException(
+                        status_code = 422,
+                        detail = f"Encoded character '{encoded_char}' is not unique in the encoding standard charset"
+                    )
 
                 if(len(char) != 1):
                     raise HTTPException(status_code=422, detail="Characters in charset must be one character long")
@@ -33,7 +39,10 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
                     raise HTTPException(status_code=422, detail="Encoded characters in charset cannot be empty")
 
                 if(len(encoded_char) != standard.encoded_char_len and standard.encoded_char_len is not None):
-                    raise HTTPException(status_code=422, detail="Encoded characters lenght in charset must be the same as defined in character encoding standard")
+                    raise HTTPException(
+                        status_code = 422,
+                        detail = "Encoded characters lenght in charset must be the same as defined in character encoding standard"
+                    )
 
                 if(standard.encoded_char_sep in encoded_char and standard.encoded_char_sep != ""):
                     raise HTTPException(status_code=422, detail="Encoded characters in charset cannot contain character separator")

@@ -7,13 +7,13 @@ from database.connection import LocalSession
 from database.models import EncodingStandard
 
 class RenameEncodingStandard(BaseModel):
-    encoding_standard_id: int = Field(..., description = "Id of the encoding standard to rename")
-    new_name: str = Field(..., description = "New name for the encoding standard")
+    encoding_standard_id: int
+    new_name: str
 
 router = APIRouter()
 
 @router.put("/encoding-standard/rename")
-def update_encoding_standard(body: RenameEncodingStandard = Body(...)):
+def rename_encoding_standard(body: RenameEncodingStandard = Body(...)):
     with LocalSession() as session:
         try:
             standard = EncodingStandard.get(session, body.encoding_standard_id)
@@ -22,7 +22,7 @@ def update_encoding_standard(body: RenameEncodingStandard = Body(...)):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
             if(EncodingStandard.get(session, name=body.new_name) is not None):
-                raise HTTPException(status_code=422, detail="Encoding standard with the same name already exists")
+                raise HTTPException(status_code=422, detail="An encoding standard with this name already exists")
 
             standard.name = body.new_name
 
