@@ -13,7 +13,7 @@ def get_all_encoding_standards():
     with LocalSession() as session:
         try:
             standards: list[EncodingStandard] = EncodingStandard.get(session)
-            standards_dict = [standard.dict for standard in standards]
+            standards_dict = [standard.dict() for standard in standards]
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
@@ -29,7 +29,7 @@ def get_encoding_standard(encoding_standard_id: int):
             if(standard is None):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
-            standard_dict = standard.dict
+            standard_dict = standard.dict()
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 

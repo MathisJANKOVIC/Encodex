@@ -47,7 +47,7 @@ def create_encoding_standard(standard: CreateEncodingStandard = Body(...)):
 
     with LocalSession() as session:
         try:
-            if(EncodingStandard.exists(session, standard.name)):
+            if(EncodingStandard.get(session, name=standard.name) is not None):
                 raise HTTPException(status_code=409, detail="An encoding standard with this name already exists")
 
             if(len(standard.name) < 3):
@@ -93,7 +93,7 @@ def create_encoding_standard(standard: CreateEncodingStandard = Body(...)):
             session.add(new_standard)
             session.commit()
 
-            new_standard_dict = new_standard.dict
+            new_standard_dict = new_standard.dict()
 
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
