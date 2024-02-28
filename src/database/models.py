@@ -53,7 +53,7 @@ class EncodingStandard(Base):
             self.charset.append(CodePoint(char, encoded_char))
 
     def dict(self) -> dict:
-        """Returns a dictionary representation of the object"""
+        """Returns a dictionary representation of the object."""
         return {
             "id": self.id,
             "name": self.name,
@@ -65,40 +65,40 @@ class EncodingStandard(Base):
         }
 
     def encode(self, char: str) -> str | None:
-        """Returns the encoded string of `char` if exists in the charset otherwise returns None"""
+        """Returns the encoded string of `char` if exists in the charset otherwise returns None."""
         for code_point in self.charset:
             if(code_point.char == char):
                 return code_point.encoded_char
         return None
 
     def decode(self, encoded_char: str) -> str | None:
-        """Returns the decoded string of `encoded_char` if exists in the charset otherwise returns None"""
+        """Returns the decoded string of `encoded_char` if exists in the charset otherwise returns None."""
         for code_point in self.charset:
             if(code_point.encoded_char == encoded_char):
                 return code_point.char
         return None
 
     def delete(self, session: Session):
-        """Deletes the encoding standard"""
+        """Deletes the encoding standard."""
         session.query(CodePoint).filter(CodePoint.encoding_standard_id == self.id).delete()
         session.delete(self)
 
     def is_encoded_char_used_by_another_char(self, char: str, encoded_char: str) -> bool:
-        """Returns True if `encoded_char` is taken by another character in the charset otherwise returns False"""
+        """Returns True if `encoded_char` is taken by another character in the charset otherwise returns False."""
         for code_point in self.charset:
             if(code_point.char != char and code_point.encoded_char == encoded_char):
                 return True
         return False
 
     def get_code_point(self, char: str) -> CodePoint | None:
-        """Returns `CodePoint` with the given `char` if exists in the charset otherwise returns None"""
+        """Returns `CodePoint` with the given `char` if exists in the charset otherwise returns None."""
         for code_point in self.charset:
             if(code_point.char == char):
                 return code_point
 
     @staticmethod
     def get(session: Session, id: int = None, name: str = None) -> EncodingStandard | None:
-        """Returns `EncodingStandard` with the given `id` and `name` if exists otherwise returns None"""
+        """Returns `EncodingStandard` with the given `id` and `name` if exists otherwise returns None."""
         if(id and name):
             return session.query(EncodingStandard).filter(EncodingStandard.id == id).filter(EncodingStandard.name == name).first()
         elif(id):
