@@ -8,8 +8,7 @@ def create(
     encoded_char_len: int | None = None,
     encoded_char_sep: str = " ",
     charset: dict[str, str] = {"a": "A", "b": "B", "c": "C"},
-) -> dict[str, str]:
-    """Creates a dictionary represation of an encoding standard with default values for unspecified fields."""
+) -> dict:
 
     if(name is None):
         name = str(uuid.uuid4())
@@ -23,6 +22,12 @@ def create(
         "charset": charset
     }
 
-def failure_message(response: Response) -> str:
-    """Returns the error message from the response or the response text if the error message is not present."""
+def message(response: Response) -> str:
+    """Return an appropriate message from a requests response to the API."""
     return response.json().get("detail") or response.text
+
+def get_without_id(response: Response) -> dict:
+    """Returns a dictionary representation of the encoding standard without the id from a requests response to the API."""
+    standard: dict = response.json().get("encoding_standard")
+    standard.pop("id", None)
+    return standard
