@@ -67,6 +67,9 @@ def create_encoding_standard(standard: CreateEncodingStandard = Body(...)):
             if(len(standard.charset.values()) != len(set(standard.charset.values()))):
                 raise HTTPException(status_code=422, detail="Encoded characters in charset must be unique")
 
+            if(standard.encoded_char_len is not None and standard.encoded_char_len < 1):
+                raise HTTPException(status_code=422, detail="encoded_char_len must be greater than 0")
+
             if(standard.encoded_char_len is None and standard.encoded_char_sep == ""):
                 raise HTTPException(
                     status_code = 422,
