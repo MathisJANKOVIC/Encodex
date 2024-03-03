@@ -1,14 +1,16 @@
-# import tests.standard as standard
-# import requests
-# import urls
+import requests
+import random
 
-# def test_delete_standard():
-#     standard = standard.create()
-#     requests.post(urls.CREATE_STANDARD, json=standard)
+import standard
+import urls
 
-#     response = requests.delete(f"{urls.DELETE_STANDARD}/{standard['name']}/")
-#     assert response.status_code == 200, standard.failure_message(response)
+def test_delete_standard():
+    response = requests.post(urls.CREATE_STANDARD, json=standard.create())
+    std_response = response.json()["encoding_standard"]
 
-# def test_delete_not_existing_standard():
-#     response = requests.delete(f"{urls.DELETE_STANDARD}/not-existing-standard/")
-#     assert response.status_code == 404, standard.message(response)
+    response = requests.delete(f"{urls.DELETE_STANDARD}/{std_response["id"]}")
+    assert response.status_code == 200, standard.message(response)
+
+def test_delete_not_existing_standard():
+    response = requests.delete(f"{urls.DELETE_STANDARD}/{random.randint(0, 100_000_000)}")
+    assert response.status_code == 404, standard.message(response)
