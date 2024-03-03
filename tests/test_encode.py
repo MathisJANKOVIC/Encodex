@@ -1,81 +1,98 @@
-# import tests.standard as standard
-# from tests.standard import message
-# import requests
-# import urls
+import requests
+import random
+import standard
+import urls
 
-# def create_to_maj_standard():
-#     standard = standard.create(
-#         charset = {
-#             "a": "A", "b": "B", "c": "C", "d": "D", "e": "E", "f": "F", "g": "G", "h": "H", "i": "I",
-#             "j": "J", "k": "K", "l": "L", "m": "M","n": "N", "o": "O", "p": "P", "q": "Q", "r": "R",
-#             "s": "S","t": "T", "u": "U", "v": "V", "w": "W", "x": "X", "y": "Y", "z": "Z"
-#         },
-#         encoded_char_len = 1,
-#         encoded_char_sep = "",
-#         case_sensitive = True,
-#         allowed_unrefenced_chars = True
-#     )
-#     requests.post(urls.CREATE_STANDARD, json=standard)
+def wrong_encoded_str_message(encoded_string: str, expected_encoded_string: str) -> str:
+    return f"expected encoded string to be '{expected_encoded_string}', got '{encoded_string}'"
 
-#     return standard
+def create_to_maj_standard():
+    return requests.post(urls.CREATE_STANDARD, json=standard.create(
+        case_sensitive = True,
+        allowed_unrefenced_chars = True,
+        encoded_char_len = 1,
+        encoded_char_sep = "",
+        charset = {
+            "a": "A", "b": "B", "c": "C", "d": "D", "e": "E", "f": "F", "g": "G",
+            "h": "H","i": "I", "j": "J", "k": "K", "l": "L", "m": "M", "n": "N",
+            "o": "O", "p": "P","q": "Q", "r": "R", "s": "S", "t": "T", "u": "U",
+            "v": "V", "w": "W", "x": "X", "y": "Y", "z": "Z"
+        }
+    ))
 
-# def create_morse_standard():
-#     standard = standard.create(
-#         charset = {
-#             "a": ".-", "b": "-...", "c": "-.-.", "d": "-..", "e": ".", "f": "..-.", "g": "--.", "h": "....", "i": "..",
-#             "j": ".---", "k": "-.-", "l": ".-..", "m": "--","n": "-.", "o": "---", "p": ".--.", "q": "--.-", "r": ".-.",
-#             "s": "...","t": "-", "u": "..-", "v": "...-", "w": ".--", "x": "-..-", "y": "-.--", "z": "--.."
-#         },
-#         encoded_char_len = None,
-#         encoded_char_sep = " ",
-#         case_sensitive = False,
-#         allowed_unrefenced_chars = False
-#     )
-#     requests.post(urls.CREATE_STANDARD, json=standard)
+def create_morse_standard():
+    return requests.post(urls.CREATE_STANDARD, json=standard.create(
+        case_sensitive = False,
+        allowed_unrefenced_chars = False,
+        encoded_char_sep = " ",
+        encoded_char_len = None,
+        charset = {
+            "a": ".-", "b": "-...", "c": "-.-.", "d": "-..", "e": ".", "f": "..-.", "g": "--.",
+            "h": "....", "i": "..", "j": ".---", "k": "-.-", "l": ".-..", "m": "--", "n": "-.",
+            "o": "---", "p": ".--.", "q": "--.-", "r": ".-.", "s": "...", "t": "-", "u": "..-",
+            "v": "...-", "w": ".--", "x": "-..-", "y": "-.--", "z": "--..", " ": "/"
+        }
+    ))
 
-#     return standard
+def test_encode_using_to_maj_standard():
+    std_response = create_to_maj_standard().json()["encoding_standard"]
 
-# def test_encode_morse():
-#     standard = create_morse_standard()
+    response = requests.post(urls.ENCODE, json={
+        "encoding_standard_id": std_response["id"],
+        "string": "test"
+    })
 
-#     response = requests.post(urls.ENCODE, json={
-#         "encoding_standard_name": standard["name"],
-#         "string": "abc"
-#     })
+    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
+    encoded_str = response.json()["encoded_string"]
+    assert encoded_str == "TEST", wrong_encoded_str_message(encoded_str, "TEST")
 
-#     assert response.status_code == 200, message(response)
-#     assert response.json()["encoded_string"] == ".- -... -.-.", message(response)
+def test_encode_using_to_maj_standard_with_unreferenced_char():
+    std_response = create_to_maj_standard().json()["encoding_standard"]
 
+    response = requests.post(urls.ENCODE, json={
+        "encoding_standard_id": std_response["id"],
+        "string": "test !"
+    })
 
-# def test_encode():
-#     standard = create_to_maj_standard()
+    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
+    encoded_str = response.json()["encoded_string"]
+    assert encoded_str == "TEST !", wrong_encoded_str_message(encoded_str, "TEST !")
 
-#     response = requests.post(urls.ENCODE, json={
-#         "encoding_standard_name": standard["name"],
-#         "string": "abc"
-#     })
+def test_encode_using_morse_standard():
+    std_response = create_morse_standard().json()["encoding_standard"]
 
-#     assert response.status_code == 200, message(response)
-#     assert response.json()["encoded_string"] == "ABC", message(response)
+    response = requests.post(urls.ENCODE, json={
+        "encoding_standard_id": std_response["id"],
+        "string": "this is a test"
+    })
 
-# def test_encode_with_unreferenced_chars():
-#     standard = create_to_maj_standard()
+    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
+    encoded_str = response.json()["encoded_string"]
+    assert encoded_str == "- .... .. ... / .. ... / .- / - . ... -", wrong_encoded_str_message(encoded_str, "- .... .. ... / .. ... / .- / - . ... -")
 
-#     response = requests.post(urls.ENCODE, json={
-#         "encoding_standard_name": standard["name"],
-#         "string": "abc/def"
-#     })
+def test_encode_using_morse_standard_with_unreferenced_char():
+    std_response = create_morse_standard().json()["encoding_standard"]
 
-#     assert response.status_code == 200, message(response)
-#     assert response.json()["encoded_string"] == "ABC/DEF", message(response)
+    response = requests.post(urls.ENCODE, json={
+        "encoding_standard_id": std_response["id"],
+        "string": "/Novak Djokovic is the GOAT/"
+    })
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
+def test_encode_using_morse_standard_sending_uppercase_chars():
+    std_response = create_morse_standard().json()["encoding_standard"]
 
+    response = requests.post(urls.ENCODE, json={
+        "encoding_standard_id": std_response["id"],
+        "string": "SOS"
+    })
+    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
+    encoded_str = response.json()["encoded_string"]
+    assert encoded_str == "... --- ...", wrong_encoded_str_message(encoded_str, "... --- ...")
 
-
-# def test_encode_with_non_existent_standard():
-#     response = requests.post(urls.ENCODE, json={
-#         "encoding_standard_name": "non-existent-standard",
-#         "string": "abc"
-#     })
-
-#     assert response.status_code == 404, message(response)
+def test_encode_using_non_existent_standard():
+    response = requests.post(urls.ENCODE, json={
+        "encoding_standard_id": random.randint(0, 100_000_000),
+        "string": "azerty"
+    })
+    assert response.status_code == 404, standard.wrong_status_code_message(response.status_code, 404)

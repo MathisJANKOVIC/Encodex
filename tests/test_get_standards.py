@@ -1,22 +1,22 @@
-# import tests.standard as standard
-# from tests.standard import message
+# import standard
 # import requests
 # import urls
 
 # def test_get_all_standards():
 #     response = requests.get(urls.GET_STANDARDS)
-#     assert response.status_code == 200, message(response)
+#     assert response.status_code == 200, standard.message(response)
 
 # def test_get_all_standards_and_check_if_standard_is_in_it():
-#     standard = standard.create()
-#     requests.post(urls.CREATE_STANDARD, json=standard)
+#     std = standard.create()
+#     requests.post(urls.CREATE_STANDARD, json=std)
 
 #     response = requests.get(urls.GET_STANDARDS)
-#     response_std = [response_std for response_std in response.json()["content"] if response_std["name"] == standard["name"]]
+#     assert response.status_code == 200, standard.message(response)
 
-#     assert response.status_code == 200, message(response)
-#     assert len(response_std) == 1, message(response)
-#     assert response_std[0] == standard, message(response)
+#     standards = [standard for standard in response.json()["content"] if standard["name"] == std["name"]]
+#     assert len(standards) == 11, standard.message(response)
+#     assert standard.remove_id(standards[0]) == std, "err"
+
 
 # def test_get_standard():
 #     standard = standard.create()

@@ -1,4 +1,3 @@
-from requests.models import Response
 import uuid
 
 def create(
@@ -22,11 +21,11 @@ def create(
         "charset": charset
     }
 
-def message(response: Response) -> str:
-    """Return an appropriate message from a requests response to the API."""
-    return response.json().get("detail") or response.text
-
 def remove_id(standard: dict) -> dict:
-    """Returns a dictionary representation of the encoding standard without the id from a requests response to the API."""
+    """Returns a dictionary representation of the encoding standard without the id."""
     standard.pop("id", None)
     return standard
+
+def wrong_status_code_message(status_code: int, expected_status_code: int) -> str:
+    """Returns a message indicating that the status code was not the expected one."""
+    return f"expected status code {expected_status_code}, got {status_code}"

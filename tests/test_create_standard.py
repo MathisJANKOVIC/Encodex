@@ -12,9 +12,9 @@ def test_create_standard_with_defined_encoded_char_len_and_empty_sep():
     )
     response = requests.post(urls.CREATE_STANDARD, json=std)
 
-    assert response.status_code == 201, standard.message(response)
+    assert response.status_code == 201, standard.wrong_status_code_message(response.status_code, 201)
     std_response = response.json()["encoding_standard"]
-    assert standard.remove_id(std_response) == std, "The response standard does not match the request standard"
+    assert standard.remove_id(std_response) == std, "response encoding standard does not match the sent one"
 
 def test_create_standard_with_encoded_char_sep_and_undefined_len():
     std = standard.create(
@@ -26,63 +26,63 @@ def test_create_standard_with_encoded_char_sep_and_undefined_len():
     )
     response = requests.post(urls.CREATE_STANDARD, json=std)
 
-    assert response.status_code == 201, standard.message(response)
+    assert response.status_code == 201, standard.wrong_status_code_message(response.status_code, 201)
     std_response = response.json()["encoding_standard"]
-    assert standard.remove_id(std_response) == std, standard.message(response)
+    assert standard.remove_id(std_response) == std, "response encoding standard does not match the sent one"
 
 def test_create_duplicate_standard():
     std = standard.create()
     requests.post(urls.CREATE_STANDARD, json=std)
 
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 409, standard.message(response)
+    assert response.status_code == 409, standard.wrong_status_code_message(response.status_code, 409)
 
 def test_create_standard_with_too_short_name():
     std = standard.create("ax")
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_too_long_name():
-    std = standard.create("s" * 37)
+    std = standard.create("w" * 37)
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_special_char_in_name():
     std = standard.create("encoding#standard")
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_encoded_char_len_small_than_1():
     std = standard.create(encoded_char_len=0)
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_undefined_encoded_char_len_and_empty_sep():
     std = standard.create(encoded_char_len=None, encoded_char_sep="")
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_undefined_encoded_char_len_and_empty_encoded_char():
     std = standard.create(charset={"a": ""}, encoded_char_len=1)
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_encoded_char_len_not_matching():
     std = standard.create(charset={"a": "rs"}, encoded_char_len=1)
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_char_len_different_than_1():
-    std = standard.create(charset={"aa": "A"})
+    std = standard.create(charset={"xx": "A"})
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_non_unique_encoded_chars():
     std = standard.create(charset={"a": "A", "b": "A", "c": "C"})
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
 
 def test_create_standard_with_encoded_char_sep_in_encoded_char():
     std = standard.create(charset={"a": "b/x"}, encoded_char_sep="/")
     response = requests.post(urls.CREATE_STANDARD, json=std)
-    assert response.status_code == 422, standard.message(response)
+    assert response.status_code == 422, standard.wrong_status_code_message(response.status_code, 422)
