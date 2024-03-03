@@ -13,7 +13,8 @@ def test_create_standard_with_defined_encoded_char_len_and_empty_sep():
     response = requests.post(urls.CREATE_STANDARD, json=std)
 
     assert response.status_code == 201, standard.message(response)
-    assert standard.get_without_id(response) == std, standard.message(response)
+    std_response = response.json().get("encoding_standard")
+    assert standard.remove_id(std_response) == std, "The response standard does not match the request standard"
 
 def test_create_standard_with_encoded_char_sep_and_undefined_len():
     std = standard.create(
@@ -26,7 +27,8 @@ def test_create_standard_with_encoded_char_sep_and_undefined_len():
     response = requests.post(urls.CREATE_STANDARD, json=std)
 
     assert response.status_code == 201, standard.message(response)
-    assert standard.get_without_id(response) == std, standard.message(response)
+    std_response = response.json().get("encoding_standard")
+    assert standard.remove_id(std_response) == std, standard.message(response)
 
 def test_create_duplicate_standard():
     std = standard.create()

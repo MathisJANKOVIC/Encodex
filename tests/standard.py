@@ -26,8 +26,7 @@ def message(response: Response) -> str:
     """Return an appropriate message from a requests response to the API."""
     return response.json().get("detail") or response.text
 
-def get_without_id(response: Response) -> dict:
+def remove_id(standard: dict) -> dict:
     """Returns a dictionary representation of the encoding standard without the id from a requests response to the API."""
-    standard: dict = response.json().get("encoding_standard")
     standard.pop("id", None)
     return standard
