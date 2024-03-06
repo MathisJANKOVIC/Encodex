@@ -16,7 +16,7 @@ class UpdateEncodingStandard(BaseModel):
 router = APIRouter()
 
 @router.patch("/encoding-standard/update")
-def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
+def update_encoding_standard_charset(body: UpdateEncodingStandard = Body(...)):
 
     with LocalSession() as session:
         try:
@@ -26,7 +26,7 @@ def update_encoding_standard(body: UpdateEncodingStandard = Body(...)):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
             for char, encoded_char in body.charset.items():
-                if(standard.is_encoded_char_used_by_another_char(session, char, encoded_char)):
+                if(standard.is_encoded_char_used_by_another_char(char, encoded_char)):
                     raise HTTPException(
                         status_code = 422,
                         detail = f"Encoded character '{encoded_char}' is not unique in the encoding standard charset"

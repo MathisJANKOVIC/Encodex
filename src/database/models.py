@@ -53,7 +53,7 @@ class EncodingStandard(Base):
             self.charset.append(CodePoint(char, encoded_char))
 
     def dict(self) -> dict:
-        """Returns a dictionary representation of the object."""
+        """Returns a dictionary representation of the encoding standard."""
         return {
             "id": self.id,
             "name": self.name,
@@ -79,7 +79,7 @@ class EncodingStandard(Base):
         return None
 
     def delete(self, session: Session):
-        """Deletes the encoding standard."""
+        """Deletes properly the encoding standard from the database."""
         session.query(CodePoint).filter(CodePoint.encoding_standard_id == self.id).delete()
         session.delete(self)
 

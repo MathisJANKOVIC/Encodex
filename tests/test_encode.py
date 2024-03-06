@@ -92,7 +92,7 @@ def test_encode_using_morse_standard_sending_uppercase_chars():
 
 def test_encode_using_non_existent_standard():
     response = requests.post(urls.ENCODE, json={
-        "encoding_standard_id": random.randint(0, 100_000_000),
+        "encoding_standard_id": random.randint(100, 100_000_000),
         "string": "azerty"
     })
     assert response.status_code == 404, standard.wrong_status_code_message(response.status_code, 404)
