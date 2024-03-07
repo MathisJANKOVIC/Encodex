@@ -10,6 +10,6 @@ DECODE = f"{BASE_URL}/encoding-standard/decode"
 
 GET_STANDARDS = f"{BASE_URL}/encoding-standard"
 CREATE_STANDARD = f"{BASE_URL}/encoding-standard/create"
-UPDATE_STANDARD = f"{BASE_URL}/encoding-standard/update"
+UPDATE_STANDARD = f"{BASE_URL}/encoding-standard/update-charset"
 DELETE_STANDARD = f"{BASE_URL}/encoding-standard/delete"
 RENAME_STANDARD = f"{BASE_URL}/encoding-standard/rename"

@@ -15,7 +15,7 @@ class UpdateEncodingStandard(BaseModel):
 
 router = APIRouter()
 
-@router.patch("/encoding-standard/update")
+@router.patch("/encoding-standard/update-charset")
 def update_encoding_standard_charset(body: UpdateEncodingStandard = Body(...)):
 
     with LocalSession() as session:

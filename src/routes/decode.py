@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from database.connection import LocalSession
 from database.models import EncodingStandard
