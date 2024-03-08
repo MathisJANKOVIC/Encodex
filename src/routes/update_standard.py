@@ -62,4 +62,4 @@ def update_encoding_standard_charset(body: UpdateEncodingStandard = Body(...)):
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-    return JSONResponse(status_code=200, content={"encoding_standard": standard_dict, "detail": "Encoding standard updated successfully"})
+    return JSONResponse(status_code=200, content={"detail": "Encoding standard updated successfully", "encoding_standard": standard_dict})

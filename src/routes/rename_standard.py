@@ -34,4 +34,4 @@ def rename_encoding_standard(body: RenameEncodingStandard = Body(...)):
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-    return JSONResponse(status_code=200, content={"encoding_standard": standard_dict, "detail": "Encoding standard renamed successfully"})
+    return JSONResponse(status_code=200, content={"detail": "Encoding standard renamed successfully", "encoding_standard": standard_dict})

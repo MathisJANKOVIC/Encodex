@@ -112,4 +112,4 @@ def create_encoding_standard(standard: CreateEncodingStandard = Body(...)):
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-    return JSONResponse(status_code=201, content={"encoding_standard": new_standard_dict, "detail": "Encoding standard created successfully"})
+    return JSONResponse(status_code=201, content={"detail": "Encoding standard created successfully", "encoding_standard": new_standard_dict})
