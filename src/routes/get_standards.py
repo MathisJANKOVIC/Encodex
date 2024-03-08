@@ -20,7 +20,7 @@ def get_all_encoding_standards():
     return JSONResponse(status_code=200, content={"content": standards_dict})
 
 @router.get("/encoding-standard/{encoding_standard_id}")
-def get_encoding_standard(encoding_standard_id: int):
+def get_specific_encoding_standard(encoding_standard_id: int):
 
     with LocalSession() as session:
         try:

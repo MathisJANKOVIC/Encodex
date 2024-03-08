@@ -7,7 +7,7 @@ from database import connection
 Base = declarative_base()
 
 class CodePoint(Base):
-    __tablename__ = 'charset'
+    __tablename__ = 'code_point'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
 
@@ -90,7 +90,7 @@ class EncodingStandard(Base):
                 return True
         return False
 
-    def get_code_point(self, char: str) -> CodePoint | None:
+    def code_point(self, char: str) -> CodePoint | None:
         """Returns `CodePoint` with the given `char` if exists in the charset otherwise returns None."""
         for code_point in self.charset:
             if(code_point.char == char):
@@ -98,12 +98,12 @@ class EncodingStandard(Base):
 
     @staticmethod
     def get(session: Session, id: int = None, name: str = None) -> EncodingStandard | None:
-        """Returns `EncodingStandard` with the given `id` and `name` if exists otherwise returns None."""
-        if(id and name):
+        """Returns the encoding standard with the given `id` and `name` if exists otherwise returns None."""
+        if(id is not None and name is not None):
             return session.query(EncodingStandard).filter(EncodingStandard.id == id).filter(EncodingStandard.name == name).first()
-        elif(id):
+        elif(id is not None):
             return session.query(EncodingStandard).filter(EncodingStandard.id == id).first()
-        elif(name):
+        elif(name is not None):
             return session.query(EncodingStandard).filter(EncodingStandard.name == name).first()
         else:
             return session.query(EncodingStandard).all()

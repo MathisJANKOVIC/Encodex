@@ -47,7 +47,7 @@ def update_encoding_standard_charset(body: UpdateEncodingStandard = Body(...)):
                 if(standard.encoded_char_sep in encoded_char and standard.encoded_char_sep != ""):
                     raise HTTPException(status_code=422, detail="Encoded characters in charset cannot contain character separator")
 
-                same_existing_char = standard.get_code_point(char)
+                same_existing_char = standard.code_point(char)
 
                 if(same_existing_char is None):
                     standard.charset.append(CodePoint(char, encoded_char))
