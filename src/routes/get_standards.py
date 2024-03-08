@@ -17,7 +17,7 @@ def get_all_encoding_standards():
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-    return JSONResponse(status_code=200, content={"content": standards_dict})
+    return JSONResponse(status_code=200, content={"encoding_standards": standards_dict})
 
 @router.get("/encoding-standard/{encoding_standard_id}")
 def get_specific_encoding_standard(encoding_standard_id: int):
@@ -33,4 +33,4 @@ def get_specific_encoding_standard(encoding_standard_id: int):
         except SQLAlchemyError:
             raise HTTPException(status_code=500, detail="An error occured with the database")
 
-    return JSONResponse(status_code=200, content={"content": standard_dict})
+    return JSONResponse(status_code=200, content={"encoding_standard": standard_dict})
