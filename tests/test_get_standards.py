@@ -1,36 +1,26 @@
-import requests
-import random
-import standard
-import urls
+from standard import Standard
 
 def test_get_all_standards():
-    response = requests.get(urls.GET_STANDARDS)
-    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
+    Standard.get_all()
 
-def test_get_all_standards_and_if_created_standard_is_in_it():
-    std1 = standard.create()
-    requests.post(urls.CREATE_STANDARD, json=std1)
+def test_get_all_standards_and_if_created_standards_are_in_it():
+    standard1 = Standard()
+    standard1.create()
 
-    std2 = standard.create()
-    requests.post(urls.CREATE_STANDARD, json=std2)
+    standard2 = Standard()
+    standard2.create()
 
-    response = requests.get(urls.GET_STANDARDS)
-    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
+    standards = [standard for standard in Standard.get_all() if standard["name"] == standard1.name or standard["name"] == standard2.name]
+    assert len(standards) == 2, "expected to find 2 standards with the names of the created ones, got " + str(len(standards))
 
-    standards = [standard for standard in response.json()["encoding_standards"] if standard["name"] == std1["name"] or standard["name"] == std2["name"]]
-    assert len(standards) == 2, "expected to find 2 standards with the names of the created ones, found: " + str(len(standards))
-
-    assert standard.remove_id(standards[0]) == std1, "created standard not found in the list of all standards"
-    assert standard.remove_id(standards[1]) == std2, "created standard not found in the list of all standards"
+    assert standards[0] == standard1.__dict__, "created standard not found in the list of all standards"
+    assert standards[1] == standard2.__dict__, "created standard not found in the list of all standards"
 
 def test_get_standard():
-    std = standard.create()
-    std_response = requests.post(urls.CREATE_STANDARD, json=std).json()["encoding_standard"]
-    response = requests.get(f"{urls.GET_STANDARDS}/{std_response['id']}")
-
-    assert response.status_code == 200, standard.wrong_status_code_message(response.status_code, 200)
-    assert standard.remove_id(response.json()["encoding_standard"]) == std, "encoding standard does not match the created one"
+    standard = Standard()
+    standard.create()
+    standard.get()
 
 def test_get_non_existent_standard():
-    response = requests.get(f"{urls.GET_STANDARDS}/{random.randint(100, 100_000_000)}")
-    assert response.status_code == 404, standard.wrong_status_code_message(response.status_code, 404)
+    standard = Standard()
+    standard.get(expected_status_code=404)

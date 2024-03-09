@@ -22,7 +22,7 @@ def rename_encoding_standard(body: RenameEncodingStandard = Body(...)):
                 raise HTTPException(status_code=404, detail="Encoding standard not found")
 
             if(EncodingStandard.get(session, name=body.new_name) is not None):
-                raise HTTPException(status_code=422, detail="An encoding standard with this name already exists")
+                raise HTTPException(status_code=409, detail="An encoding standard with this name already exists")
 
             standard.name = body.new_name
 
